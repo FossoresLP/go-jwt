@@ -35,7 +35,7 @@ func TestJWT_validate(t *testing.T) {
 		{"Normal", JWT{Header{Typ: "JWT", Alg: "test"}, nil, []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), false},
 		{"Unkown algorithm", JWT{Header{Typ: "JWT", Alg: "sample"}, nil, nil, nil}, nil, true},
 		{"Invalid hash", JWT{Header{Typ: "JWT", Alg: "test"}, nil, nil, nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), true},
-		{"Invalid Expires", JWT{Header{Typ: "JWT", Alg: "test"}, nil, []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJleHAiOjF9"), nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJleHAiOjF9"), true},
+		{"Invalid Expires", JWT{Header{Typ: "JWT", Alg: "test"}, []byte(`{"exp":1}`), []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJleHAiOjF9"), nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJleHAiOjF9"), true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
