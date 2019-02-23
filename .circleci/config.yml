@@ -6,7 +6,6 @@ jobs:
     working_directory: ~/jwt
     steps:
       - checkout
-      - run: date --set="16 August 2018 10:00:00"
       - run: go get
       - run: go get -u github.com/jstemmer/go-junit-report
       - run: go get -u github.com/mattn/goveralls
