@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/golang:latest
-    working_directory: /jwt
+    working_directory: ~/jwt
     steps:
       - checkout
       - run: go get
