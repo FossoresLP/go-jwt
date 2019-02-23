@@ -8,7 +8,7 @@ import (
 )
 
 // Validate returns an error when the hash does not match the content
-func (jwt JWT) Validate() error {
+func (jwt JWT) Valid() error {
 	return jwt.validationError
 }
 

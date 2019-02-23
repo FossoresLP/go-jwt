@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestJWT_Validate(t *testing.T) {
+func TestJWT_Valid(t *testing.T) {
 	tests := []struct {
 		name    string
 		jwt     JWT
@@ -17,8 +17,8 @@ func TestJWT_Validate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.jwt.Validate(); (err != nil) != tt.wantErr {
-				t.Errorf("JWT.Validate() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.jwt.Valid(); (err != nil) != tt.wantErr {
+				t.Errorf("JWT.Valid() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
