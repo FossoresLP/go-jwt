@@ -1,0 +1,4 @@
+github.com/fossoreslp/go-jwt-ed25519 v0.0.0-20181203204907-7c42f49dbc30 h1:Vev2i1JqWQIDAPL75Ov05LbggaZXAuccawPeaQYCw8Q=
+github.com/fossoreslp/go-jwt-ed25519 v0.0.0-20181203204907-7c42f49dbc30/go.mod h1:+KKHf67giSS8qARZow9kZ1b/FirBrhpmJvdhDNqDb6g=
+golang.org/x/crypto v0.0.0-20190222235706-ffb98f73852f h1:qWFY9ZxP3tfI37wYIs/MnIAqK0vlXp1xnYEa5HxFSSY=
+golang.org/x/crypto v0.0.0-20190222235706-ffb98f73852f/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
