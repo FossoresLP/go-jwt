@@ -57,7 +57,7 @@ func TestNew(t *testing.T) {
 		data []byte
 		want JWT
 	}{
-		{"Normal", []byte("Test"), JWT{Header{Typ: "JWT"}, []byte("Test"), nil, nil}},
+		{"Normal", []byte("Test"), JWT{Header{Typ: "JWT"}, []byte("Test"), nil}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -97,7 +97,7 @@ func TestJWT_Encode(t *testing.T) {
 		wantResult []byte
 		wantErr    bool
 	}{
-		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil, nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), false},
+		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -115,13 +115,13 @@ func TestJWT_Encode(t *testing.T) {
 
 func TestJWT_Encode_Edgecases(t *testing.T) {
 	defaultAlgorithm = ""
-	_, err := JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil, nil}.Encode()
+	_, err := JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}.Encode()
 	if err == nil {
 		t.Error("JWT.Encode() should fail when default algorithm is not set")
 	}
 
 	defaultAlgorithm = "sample"
-	_, err = JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil, nil}.Encode()
+	_, err = JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}.Encode()
 	if err == nil {
 		t.Error("JWT.Encode() should fail when default algorithm does not exist")
 	}

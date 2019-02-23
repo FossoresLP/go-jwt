@@ -39,13 +39,13 @@ func Decode(in []byte) (data JWT, err error) {
 	}
 
 	// Decode Hash
-	data.Hash = make([]byte, base64.RawURLEncoding.DecodedLen(len(sections[2])))
-	if n, e := base64.RawURLEncoding.Decode(data.Hash, sections[2]); e != nil || n < 1 || data.Hash == nil {
+	signature := make([]byte, base64.RawURLEncoding.DecodedLen(len(sections[2])))
+	if n, e := base64.RawURLEncoding.Decode(signature, sections[2]); e != nil || n < 1 || signature == nil {
 		err = errors.New("hash invalid")
 		return
 	}
 
-	data.validationError = data.validate(join(sections[0], sections[1]))
+	data.validationError = data.validate(join(sections[0], sections[1]), signature)
 
 	return
 }

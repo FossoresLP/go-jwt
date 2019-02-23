@@ -14,7 +14,7 @@ func TestDecode(t *testing.T) {
 		wantData JWT
 		wantErr  bool
 	}{
-		{"Normal", []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), nil}, false},
+		{"Normal", []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}, false},
 		{"TwoSections", []byte("A.B"), JWT{}, true},
 		{"OneSection", []byte("A"), JWT{}, true},
 		{"FourSections", []byte("A.B.C.D"), JWT{}, true},

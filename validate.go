@@ -12,14 +12,14 @@ func (jwt JWT) Validate() error {
 	return jwt.validationError
 }
 
-func (jwt JWT) validate(data []byte) error {
+func (jwt JWT) validate(data, signature []byte) error {
 	alg, err := jwt.Header.getAlgorithm()
 	if err != nil {
 		return err
 	}
 
 	// Check the hash using the Verify function of the algorithm declared by the header
-	if !alg.Verify(data, jwt.Hash, jwt.Header) {
+	if !alg.Verify(data, signature, jwt.Header) {
 		return errors.New("hash does not match content")
 	}
 

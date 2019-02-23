@@ -13,7 +13,6 @@ type Header struct {
 type JWT struct {
 	Header          Header
 	Content         []byte
-	Hash            []byte
 	validationError error
 }
 

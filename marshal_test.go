@@ -14,7 +14,7 @@ func TestJWT_MarshalText(t *testing.T) {
 		want    []byte
 		wantErr bool
 	}{
-		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil, nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), false},
+		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -51,8 +51,8 @@ func TestJWT_UnmarshalText(t *testing.T) {
 				t.Errorf("JWT.UnmarshalText() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !tt.wantErr && !reflect.DeepEqual(tt.jwt, &JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), nil}) {
-				t.Errorf("JWT.UnmarshalText() = %+v, want %+v", tt.jwt, &JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), nil})
+			if !tt.wantErr && !reflect.DeepEqual(tt.jwt, &JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}) {
+				t.Errorf("JWT.UnmarshalText() = %+v, want %+v", tt.jwt, &JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil})
 			}
 		})
 	}
@@ -67,7 +67,7 @@ func TestJWT_MarshalBinary(t *testing.T) {
 		want    []byte
 		wantErr bool
 	}{
-		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil, nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), false},
+		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -104,8 +104,8 @@ func TestJWT_UnmarshalBinary(t *testing.T) {
 				t.Errorf("JWT.UnmarshalBinary() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !tt.wantErr && !reflect.DeepEqual(tt.jwt, &JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), nil}) {
-				t.Errorf("JWT.UnmarshalText() = %+v, want %+v", tt.jwt, &JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), nil})
+			if !tt.wantErr && !reflect.DeepEqual(tt.jwt, &JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}) {
+				t.Errorf("JWT.UnmarshalText() = %+v, want %+v", tt.jwt, &JWT{Header{Typ: "JWT", Alg: "test"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil})
 			}
 		})
 	}

@@ -9,7 +9,7 @@ import (
 // New returns a new JWT containing content
 // Content has to be encoded JSON
 func New(content []byte) JWT {
-	return JWT{Header{Typ: "JWT"}, content, nil, nil}
+	return JWT{Header{Typ: "JWT"}, content, nil}
 }
 
 // Encode a JWT to a byte slice
