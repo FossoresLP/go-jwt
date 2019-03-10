@@ -1,23 +1,47 @@
 version: 2
 jobs:
-  build:
+  go-test:
     docker:
-      - image: circleci/golang:latest
+      - image: golang:alpine
     working_directory: ~/jwt
     steps:
       - checkout
-      - run: go get
       - run: go get -u github.com/jstemmer/go-junit-report
-      - run: go get -u github.com/mattn/goveralls@master
       - run: mkdir test-results
       - run:
-          name: Run unit tests
+          name: Base package unit tests
           command: go test -v 2>&1 | go-junit-report > test-results/report.xml
+      - run:
+          name: HS provider unit tests
+          command: cd alg-hs && go test -v 2>&1 | go-junit-report > test-results/report-hs.xml
+      - run:
+          name: EdDSA provider unit tests
+          command: cd alg-eddsa && go test -v 2>&1 | go-junit-report > test-results/report-eddsa.xml
+      - store_test_results:
+          path: test-results
+  coverage:
+    docker:
+      - image: golang:alpine
+    working_directory: ~/jwt
+    steps:
+      - checkout
+      - run: go get -u github.com/mattn/goveralls@master
       - run:
           name: Coverage
           command: goveralls -show -service=circle-ci
+  go-vet:
+    docker:
+      - image: golang:alpine
+    working_directory: ~/jwt
+    steps:
+      - checkout
       - run:
           name: go vet
           command: go vet
-      - store_test_results:
-          path: test-results
+
+workflows:
+  version: 2
+  run-tests:
+    - go-test
+    - coverage
+    - go-vet
