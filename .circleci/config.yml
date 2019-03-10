@@ -6,6 +6,7 @@ jobs:
     working_directory: ~/jwt
     steps:
       - checkout
+      - run: apk add git
       - run: go get -u github.com/jstemmer/go-junit-report
       - run: mkdir test-results
       - run:
@@ -25,6 +26,7 @@ jobs:
     working_directory: ~/jwt
     steps:
       - checkout
+      - run: apk add git
       - run: go get -u github.com/mattn/goveralls@master
       - run:
           name: Coverage
@@ -35,6 +37,7 @@ jobs:
     working_directory: ~/jwt
     steps:
       - checkout
+      - run: apk add git
       - run:
           name: go vet
           command: go vet
