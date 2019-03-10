@@ -2,6 +2,7 @@ package hs
 
 import (
 	"encoding/base64"
+	"reflect"
 	"testing"
 
 	"github.com/fossoreslp/go-jwt"
@@ -82,5 +83,80 @@ func TestHS512(t *testing.T) {
 	}
 	if dec.Valid() != nil {
 		t.Errorf("Decoded JWT could not be validated: %s", dec.Valid().Error())
+	}
+}
+
+func TestHeader(t *testing.T) {
+	h := jwt.Header{Typ: "JWT"}
+	HS256Provider{kid: "key_id", jku: "key_url"}.Header(&h)
+	if h.Alg != HS256 {
+		t.Errorf("HS256Provider.Header() should set Alg to \"HS256\" but instead it is %q", h.Alg)
+	}
+	if h.Kid != "key_id" {
+		t.Errorf("HS256Provider.Header() should set Kid to \"key_id\" but instead it is %q", h.Kid)
+	}
+	if h.Jku != "key_url" {
+		t.Errorf("HS256Provider.Header() should set Jku to \"key_url\" but instead it is %q", h.Jku)
+	}
+
+	h = jwt.Header{Typ: "JWT"}
+	HS384Provider{kid: "key_id", jku: "key_url"}.Header(&h)
+	if h.Alg != HS384 {
+		t.Errorf("HS384Provider.Header() should set Alg to \"HS384\" but instead it is %q", h.Alg)
+	}
+	if h.Kid != "key_id" {
+		t.Errorf("HS384Provider.Header() should set Kid to \"key_id\" but instead it is %q", h.Kid)
+	}
+	if h.Jku != "key_url" {
+		t.Errorf("HS384Provider.Header() should set Jku to \"key_url\" but instead it is %q", h.Jku)
+	}
+
+	h = jwt.Header{Typ: "JWT"}
+	HS512Provider{kid: "key_id", jku: "key_url"}.Header(&h)
+	if h.Alg != HS512 {
+		t.Errorf("HS512Provider.Header() should set Alg to \"HS512\" but instead it is %q", h.Alg)
+	}
+	if h.Kid != "key_id" {
+		t.Errorf("HS512Provider.Header() should set Kid to \"key_id\" but instead it is %q", h.Kid)
+	}
+	if h.Jku != "key_url" {
+		t.Errorf("HS512Provider.Header() should set Jku to \"key_url\" but instead it is %q", h.Jku)
+	}
+
+}
+
+func TestLoadProvider(t *testing.T) {
+	k := LoadProvider(KeySet{kid: "key_id"}, HS256)
+	if _, ok := k.(HS256Provider); !ok {
+		t.Errorf("LoadProvider() did not return a HS256 provider but %s", reflect.TypeOf(k).String())
+	}
+	if k.(HS256Provider).kid != "key_id" {
+		t.Errorf("LoadProvider() did not pass the data from the input keyset onto the provider")
+	}
+
+	k = LoadProvider(KeySet{kid: "key_id"}, HS384)
+	if _, ok := k.(HS384Provider); !ok {
+		t.Errorf("LoadProvider() did not return a HS384 provider but %s", reflect.TypeOf(k).String())
+	}
+	if k.(HS384Provider).kid != "key_id" {
+		t.Errorf("LoadProvider() did not pass the data from the input keyset onto the provider")
+	}
+
+	k = LoadProvider(KeySet{kid: "key_id"}, HS512)
+	if _, ok := k.(HS512Provider); !ok {
+		t.Errorf("LoadProvider() did not return a HS512 provider but %s", reflect.TypeOf(k).String())
+	}
+	if k.(HS512Provider).kid != "key_id" {
+		t.Errorf("LoadProvider() did not pass the data from the input keyset onto the provider")
+	}
+}
+
+func TestUnknownAlgorithm(t *testing.T) {
+	if _, _, err := NewProvider("unknown"); err == nil {
+		t.Error("NewProvider() with an unknown algorithm type should fail but returned no error.")
+	}
+
+	if LoadProvider(KeySet{}, "unknown") != nil {
+		t.Error("LoadProvider() with an unknown algorithm type did not return nil.")
 	}
 }
