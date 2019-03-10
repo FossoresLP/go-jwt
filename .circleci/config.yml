@@ -14,10 +14,10 @@ jobs:
           command: go test -v 2>&1 | go-junit-report > test-results/report.xml
       - run:
           name: HS provider unit tests
-          command: cd alg-hs && go test -v 2>&1 | go-junit-report > test-results/report-hs.xml
+          command: go test -v ./alg-hs 2>&1 | go-junit-report > test-results/report-hs.xml
       - run:
           name: EdDSA provider unit tests
-          command: cd alg-eddsa && go test -v 2>&1 | go-junit-report > test-results/report-eddsa.xml
+          command: go test -v ./alg-eddsa 2>&1 | go-junit-report > test-results/report-eddsa.xml
       - store_test_results:
           path: test-results
   coverage:
