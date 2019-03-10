@@ -26,13 +26,15 @@ jobs:
     working_directory: ~/jwt
     steps:
       - checkout
-      - run: apk add git
+      - run: apk add git curl
+      - run: curl -o codecov.io https://codecov.io/bash
+      - run: chmod +x codecov.io
       - run:
           name: Calculate coverage
           command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-eddsa
       - run:
           name: Upload coverage
-          command: bash <(curl -s https://codecov.io/bash)
+          command: ./codecov.io
   go-vet:
     docker:
       - image: golang:alpine
