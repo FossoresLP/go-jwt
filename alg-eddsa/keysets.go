@@ -62,7 +62,7 @@ type Ed448KeySet struct {
 }
 
 // SetKeys sets the keys of the key set
-func (ks *Ed448KeySet) SetKeys(priv, pub []byte, kid string) error {
+func (ks *Ed448KeySet) SetKeys(priv, pub []byte) error {
 	if priv != nil {
 		if len(priv) != 144 {
 			return errors.New("private key has wrong size")

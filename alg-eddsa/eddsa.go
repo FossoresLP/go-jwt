@@ -1,6 +1,8 @@
 package eddsa
 
 import (
+	"errors"
+
 	"github.com/fossoreslp/go-jwt"
 	"github.com/fossoreslp/go-jwt/publickey"
 	"github.com/fossoreslp/go-uuid-v4"
@@ -25,6 +27,9 @@ type Provider struct {
 
 // NewProvider creates a new Provider generating the necessary keypairs
 func NewProvider(defaultCurve string) (Provider, []publickey.PublicKey, error) {
+	if defaultCurve != Ed25519 && defaultCurve != Ed448 {
+		return Provider{}, nil, errors.New("unknown curve supplied as default curve")
+	}
 	pub2, priv2, err := ed25519.GenerateKey(nil)
 	if err != nil {
 		return Provider{}, nil, err
@@ -60,6 +65,9 @@ func NewProviderWithKeyURL(defaultCurve, keyURL string) (Provider, []publickey.P
 
 // LoadProvider returns a Provider using the supplied keypairs
 func LoadProvider(k2 Ed25519KeySet, k4 Ed448KeySet, defaultCurve string) Provider {
+	if defaultCurve != Ed25519 && defaultCurve != Ed448 {
+		return Provider{}
+	}
 	c := ed448.NewCurve()
 	return Provider{k2, k4, c, defaultCurve}
 }
