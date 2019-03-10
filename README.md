@@ -2,7 +2,8 @@ Modular JWT / JWS provider in Golang
 ====================================
 
 [![CircleCI](https://img.shields.io/circleci/project/github/FossoresLP/go-jwt/master.svg?style=flat-square)](https://circleci.com/gh/FossoresLP/go-jwt)
-[![Coveralls](https://img.shields.io/coveralls/github/FossoresLP/go-jwt/master.svg?style=flat-square)](https://coveralls.io/github/FossoresLP/go-jwt)
+<!--[![Coveralls](https://img.shields.io/coveralls/github/FossoresLP/go-jwt/master.svg?style=flat-square)](https://coveralls.io/github/FossoresLP/go-jwt)-->
+[![Codecov](https://img.shields.io/codecov/c/gh/FossoresLP/go-jwt.svg?style=flat-square)](https://codecov.io/gh/FossoresLP/go-jwt)
 [![Codacy](https://img.shields.io/codacy/grade/52a3263fab6a4a3f8b22b2ae3bb93d32.svg?style=flat-square)](https://www.codacy.com/app/FossoresLP/go-jwt)
 [![Licensed under: Boost Software License](https://img.shields.io/badge/style-BSL--1.0-red.svg?longCache=true&style=flat-square&label=License)](https://github.com/FossoresLP/go-jwt/blob/master/LICENSE.md)
 [![GoDoc](https://img.shields.io/badge/style-reference-blue.svg?longCache=true&style=flat-square&label=GoDoc)](https://godoc.org/github.com/FossoresLP/go-jwt)
