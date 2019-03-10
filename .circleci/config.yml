@@ -27,10 +27,12 @@ jobs:
     steps:
       - checkout
       - run: apk add git
-      - run: go get -u github.com/mattn/goveralls@master
       - run:
-          name: Coverage
-          command: goveralls -show -service=circle-ci
+          name: Calculate coverage
+          command: go test -race -coverprofile=coverage.txt -covermode=atomic . ./alg-hs ./alg-eddsa
+      - run:
+          name: Upload coverage
+          command: bash <(curl -s https://codecov.io/bash)
   go-vet:
     docker:
       - image: golang:alpine
