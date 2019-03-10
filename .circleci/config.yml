@@ -29,7 +29,7 @@ jobs:
       - run: apk add git
       - run:
           name: Calculate coverage
-          command: go test -race -coverprofile=coverage.txt -covermode=atomic . ./alg-hs ./alg-eddsa
+          command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-eddsa
       - run:
           name: Upload coverage
           command: bash <(curl -s https://codecov.io/bash)
