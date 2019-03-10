@@ -32,7 +32,7 @@ jobs:
           command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-eddsa
       - run:
           name: Upload coverage
-          command: bash <(curl -s https://codecov.io/bash)
+          command: bash bash <(curl -s https://codecov.io/bash)
   go-vet:
     docker:
       - image: golang:alpine
