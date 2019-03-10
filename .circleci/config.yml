@@ -18,6 +18,9 @@ jobs:
       - run:
           name: EdDSA provider unit tests
           command: go test -v ./alg-eddsa 2>&1 | go-junit-report > test-results/report-eddsa.xml
+      - run:
+          name: Public key unit tests
+          command: go test -v ./publickey 2>&1 | go-junit-report > test-results/report-publickey.xml
       - store_test_results:
           path: test-results
   coverage:
@@ -31,7 +34,7 @@ jobs:
       - run: chmod +x uploader.run
       - run:
           name: Calculate coverage
-          command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-eddsa
+          command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-eddsa ./publickey
       - run:
           name: Upload coverage
           command: ./uploader.run
