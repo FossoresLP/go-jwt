@@ -27,14 +27,14 @@ jobs:
     steps:
       - checkout
       - run: apk add git curl bash
-      - run: curl -o codecov.io https://codecov.io/bash
-      - run: chmod +x codecov.io
+      - run: curl -o codecov.run https://codecov.io/bash
+      - run: chmod +x codecov.run
       - run:
           name: Calculate coverage
           command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-eddsa
       - run:
           name: Upload coverage
-          command: ./codecov.io
+          command: ./codecov.run
   go-vet:
     docker:
       - image: golang:alpine
