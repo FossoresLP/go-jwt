@@ -2,6 +2,7 @@ package eddsa
 
 import (
 	"github.com/fossoreslp/go-jwt"
+	"github.com/fossoreslp/go-jwt/publickey"
 	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/otrv4/ed448"
 	"golang.org/x/crypto/ed25519"
@@ -23,7 +24,7 @@ type Provider struct {
 }
 
 // NewProvider creates a new Provider generating the necessary keypairs
-func NewProvider(defaultCurve string) (Provider, []PublicKey, error) {
+func NewProvider(defaultCurve string) (Provider, []publickey.PublicKey, error) {
 	pub2, priv2, err := ed25519.GenerateKey(nil)
 	if err != nil {
 		return Provider{}, nil, err
@@ -43,11 +44,11 @@ func NewProvider(defaultCurve string) (Provider, []PublicKey, error) {
 		return Provider{}, nil, err
 	}
 	ks4 := Ed448KeySet{priv4, pub4, id4, "", true, true}
-	return Provider{ks2, ks4, curve, defaultCurve}, []PublicKey{ks2.GetPublicKey(), ks4.GetPublicKey()}, nil
+	return Provider{ks2, ks4, curve, defaultCurve}, []publickey.PublicKey{ks2.GetPublicKey(), ks4.GetPublicKey()}, nil
 }
 
 // NewProviderWithKeyURL works just like NewProvider but also sets the key URL of the generated keys
-func NewProviderWithKeyURL(defaultCurve, keyURL string) (Provider, []PublicKey, error) {
+func NewProviderWithKeyURL(defaultCurve, keyURL string) (Provider, []publickey.PublicKey, error) {
 	p, k, err := NewProvider(defaultCurve)
 	if err != nil {
 		return Provider{}, nil, err

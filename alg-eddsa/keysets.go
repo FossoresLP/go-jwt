@@ -3,6 +3,7 @@ package eddsa
 import (
 	"errors"
 
+	"github.com/fossoreslp/go-jwt/publickey"
 	"golang.org/x/crypto/ed25519"
 )
 
@@ -46,8 +47,8 @@ func (ks *Ed25519KeySet) SetKeyURL(jku string) {
 }
 
 // GetPublicKey returns the public key of the keyset
-func (ks Ed25519KeySet) GetPublicKey() PublicKey {
-	return PublicKey{[]byte(ks.public), ks.kid}
+func (ks Ed25519KeySet) GetPublicKey() publickey.PublicKey {
+	return publickey.New([]byte(ks.public), ks.kid)
 }
 
 // Ed448KeySet stores a set of Ed448 public and private keys
@@ -90,22 +91,6 @@ func (ks *Ed448KeySet) SetKeyURL(jku string) {
 }
 
 // GetPublicKey returns the public key of the keyset
-func (ks Ed448KeySet) GetPublicKey() PublicKey {
-	return PublicKey{ks.public[:], ks.kid}
-}
-
-// PublicKey represents a public key
-type PublicKey struct {
-	key []byte
-	kid string
-}
-
-// GetPublicKey returns the key as a byte slice
-func (s PublicKey) GetPublicKey() []byte {
-	return s.key
-}
-
-// GetKeyID returns the keys ID
-func (s PublicKey) GetKeyID() string {
-	return s.kid
+func (ks Ed448KeySet) GetPublicKey() publickey.PublicKey {
+	return publickey.New(ks.public[:], ks.kid)
 }

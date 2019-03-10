@@ -8,6 +8,7 @@ import (
 	"errors"
 
 	"github.com/fossoreslp/go-jwt"
+	"github.com/fossoreslp/go-jwt/publickey"
 	"github.com/fossoreslp/go-uuid-v4"
 )
 
@@ -30,12 +31,12 @@ type Provider interface {
 }
 
 // NewProvider creates a new Provider generating the necessary keypairs
-func NewProvider(t string) (Provider, []PublicKey, error) {
+func NewProvider(t string) (Provider, []publickey.PublicKey, error) {
 	return NewProviderWithKeyURL(t, "")
 }
 
 // NewProviderWithKeyURL works just like NewProvider but also sets the key URL of the generated keys
-func NewProviderWithKeyURL(t, keyURL string) (Provider, []PublicKey, error) {
+func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, error) {
 	kid, err := uuid.NewString()
 	if err != nil {
 		return nil, nil, err
@@ -65,7 +66,7 @@ func NewProviderWithKeyURL(t, keyURL string) (Provider, []PublicKey, error) {
 	case HS512:
 		p = HS512Provider{b, kid, keyURL}
 	}
-	return p, []PublicKey{PublicKey{b, kid}}, nil
+	return p, []publickey.PublicKey{publickey.New(b, kid)}, nil
 }
 
 // LoadProvider returns a Provider using the supplied keypairs

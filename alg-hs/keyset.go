@@ -2,6 +2,8 @@ package hs
 
 import (
 	"errors"
+
+	"github.com/fossoreslp/go-jwt/publickey"
 )
 
 // KeySet stores the key for an algorithm
@@ -30,22 +32,6 @@ func (ks *KeySet) SetKeyURL(jku string) {
 }
 
 // GetPublicKey returns the public key of the keyset (in this package the is only one key - to not share it publically or everyone else will be able to create authentic signatures)
-func (ks KeySet) GetPublicKey() PublicKey {
-	return PublicKey{ks.key, ks.kid}
-}
-
-// PublicKey represents a public key
-type PublicKey struct {
-	key []byte
-	kid string
-}
-
-// GetPublicKey returns the key as a byte slice
-func (s PublicKey) GetPublicKey() []byte {
-	return s.key
-}
-
-// GetKeyID returns the keys ID
-func (s PublicKey) GetKeyID() string {
-	return s.kid
+func (ks KeySet) GetPublicKey() publickey.PublicKey {
+	return publickey.New(ks.key, ks.kid)
 }

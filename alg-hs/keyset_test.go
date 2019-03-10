@@ -3,6 +3,8 @@ package hs
 import (
 	"reflect"
 	"testing"
+
+	"github.com/fossoreslp/go-jwt/publickey"
 )
 
 func TestKeySet_SetKeys(t *testing.T) {
@@ -62,49 +64,15 @@ func TestKeySet_GetPublicKey(t *testing.T) {
 	tests := []struct {
 		name string
 		ks   KeySet
-		want PublicKey
+		want publickey.PublicKey
 	}{
-		{"Key only", KeySet{key: []byte("test")}, PublicKey{key: []byte("test")}},
-		{"Key with ID", KeySet{key: []byte("test"), kid: "key_id"}, PublicKey{key: []byte("test"), kid: "key_id"}},
+		{"Key only", KeySet{key: []byte("test")}, publickey.New([]byte("test"), "")},
+		{"Key with ID", KeySet{key: []byte("test"), kid: "key_id"}, publickey.New([]byte("test"), "key_id")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.ks.GetPublicKey(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("KeySet.GetPublicKey() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestPublicKey_GetPublicKey(t *testing.T) {
-	tests := []struct {
-		name string
-		s    PublicKey
-		want []byte
-	}{
-		{"Normal", PublicKey{key: []byte("test")}, []byte("test")},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.s.GetPublicKey(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PublicKey.GetPublicKey() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestPublicKey_GetKeyID(t *testing.T) {
-	tests := []struct {
-		name string
-		s    PublicKey
-		want string
-	}{
-		{"Normal", PublicKey{kid: "key_id"}, "key_id"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.s.GetKeyID(); got != tt.want {
-				t.Errorf("PublicKey.GetKeyID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
