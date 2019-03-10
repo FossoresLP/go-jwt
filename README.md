@@ -11,6 +11,8 @@ This packages implements JSON Web Token as defined in [RFC 7519](https://tools.i
 
 This package is not capable of validating signatures on it's own. It is made to be modular and needs packages that provide their own signature algorithms.
 
+The default algorithms can be found in sub-packages in this repository. Only EdDSA and HS are currently available, all others are WIP.
+
 Data structures
 ---------------
 
@@ -24,7 +26,7 @@ type JWT struct {
 		Kid string // Key ID of the key used to sign the token.
 		Jku string // URL presenting public key necessary for validation.
 	}
-	Content []byte // Should be either a map with strings as keys or a struct to adhere to the standard.
+	Content []byte // Encoded JSON as specified in RFC 7519 (Should be based on map or struct in Go)
 }
 ```
 
