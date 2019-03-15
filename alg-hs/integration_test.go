@@ -1,6 +1,8 @@
 package hs
 
 import (
+	"bytes"
+	"crypto/rand"
 	"encoding/base64"
 	"reflect"
 	"testing"
@@ -159,4 +161,18 @@ func TestUnknownAlgorithm(t *testing.T) {
 	if LoadProvider(KeySet{}, "unknown") != nil {
 		t.Error("LoadProvider() with an unknown algorithm type did not return nil.")
 	}
+}
+
+func TestInvalidRandomGenerator(t *testing.T) {
+	random := rand.Reader
+	rand.Reader = bytes.NewReader(nil)
+	if _, _, err := NewProviderWithKeyURL(HS256, "key_url"); err == nil {
+		t.Error("NewProviderWithKeyURL() should fail with invalid random generator for UUID")
+	}
+	b := [16]byte{0x00}
+	rand.Reader = bytes.NewReader(b[:])
+	if _, _, err := NewProviderWithKeyURL(HS256, "key_url"); err == nil {
+		t.Error("NewProviderWithKeyURL() should fail with empty random generator for secret key")
+	}
+	rand.Reader = random
 }
