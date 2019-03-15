@@ -5,7 +5,6 @@ import (
 
 	"github.com/fossoreslp/go-jwt"
 	"github.com/fossoreslp/go-jwt/publickey"
-	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/otrv4/ed448"
 	"golang.org/x/crypto/ed25519"
 )
@@ -30,26 +29,15 @@ func NewProvider(defaultCurve string) (Provider, []publickey.PublicKey, error) {
 	if defaultCurve != Ed25519 && defaultCurve != Ed448 {
 		return Provider{}, nil, errors.New("unknown curve supplied as default curve")
 	}
-	pub2, priv2, err := ed25519.GenerateKey(nil)
+	ks2, err := generateEd25519KeySet()
 	if err != nil {
 		return Provider{}, nil, err
 	}
-	id2, err := uuid.NewString()
+	ks4, err := generateEd448KeySet()
 	if err != nil {
 		return Provider{}, nil, err
 	}
-	ks2 := Ed25519KeySet{priv2, pub2, id2, "", true, true}
-	curve := ed448.NewCurve()
-	priv4, pub4, ok := curve.GenerateKeys()
-	if !ok {
-		return Provider{}, nil, err
-	}
-	id4, err := uuid.NewString()
-	if err != nil {
-		return Provider{}, nil, err
-	}
-	ks4 := Ed448KeySet{priv4, pub4, id4, "", true, true}
-	return Provider{ks2, ks4, curve, defaultCurve}, []publickey.PublicKey{ks2.GetPublicKey(), ks4.GetPublicKey()}, nil
+	return Provider{ks2, ks4, ed448.NewCurve(), defaultCurve}, []publickey.PublicKey{ks2.GetPublicKey(), ks4.GetPublicKey()}, nil
 }
 
 // NewProviderWithKeyURL works just like NewProvider but also sets the key URL of the generated keys

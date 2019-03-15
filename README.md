@@ -21,7 +21,7 @@ JWTs are stored as a struct with the following layout
 ```go
 type JWT struct {
 	Header struct {
-		Typ string // Type of the token, has to be a JWT.
+		Typ string // Type of the token, has to be JWT.
 		Alg string // Algorithm used to sign the token (this package signs using EdDSA).
 		Kid string // Key ID of the key used to sign the token.
 		Jku string // URL presenting public key necessary for validation.

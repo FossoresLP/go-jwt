@@ -1,6 +1,8 @@
 package eddsa
 
 import (
+	"bytes"
+	"crypto/rand"
 	"reflect"
 	"testing"
 
@@ -34,7 +36,19 @@ func TestNewProvider(t *testing.T) {
 	if err == nil {
 		t.Errorf("NewProvider() succeded for an unknown curve")
 	}
-
+	random := rand.Reader
+	rand.Reader = bytes.NewReader(nil)
+	_, _, err = NewProvider(Ed25519)
+	if err == nil {
+		t.Error("NewProvider() with invalid random generator did not fail")
+	}
+	b := [48]byte{0x00}
+	rand.Reader = bytes.NewReader(b[:])
+	_, _, err = NewProvider(Ed25519)
+	if err == nil {
+		t.Error("NewProvider() with invalid random generator did not fail")
+	}
+	rand.Reader = random
 }
 
 func TestNewProviderWithKeyURL(t *testing.T) {
@@ -54,6 +68,13 @@ func TestNewProviderWithKeyURL(t *testing.T) {
 	if len(k) != 2 {
 		t.Errorf("NewProviderWithKeyURL() should return 2 public keys but instead returned %d", len(k))
 	}
+	random := rand.Reader
+	rand.Reader = bytes.NewReader(nil)
+	_, _, err = NewProviderWithKeyURL(Ed25519, "key_url")
+	if err == nil {
+		t.Error("NewProviderWithKeyURL() with invalid random generator did not fail")
+	}
+	rand.Reader = random
 }
 
 func TestLoadProvider(t *testing.T) {
