@@ -24,11 +24,17 @@ const (
 	RS512 = "RS512"
 )
 
-// Provider is an interface all providers in this package support
-type Provider interface {
-	Header(h *jwt.Header)
-	Sign(c []byte) []byte
-	Verify(data, sig []byte, h jwt.Header) bool
+// init is only here to make sure the imports for SHA256, SHA384 and SHA512 are not removed automatically and therefore available to hash.Hash
+func init() {
+	_ = sha256.New()
+	_ = sha512.New()
+}
+
+// Provider provides RSA PKCS#1 v1.5 using the selected hashing algorithm JWS signing and verification
+type Provider struct {
+	alg  string
+	hash crypto.Hash
+	set  KeySet
 }
 
 // NewProvider creates a new Provider generating the necessary keypairs
@@ -40,26 +46,26 @@ func NewProvider(t string) (Provider, []PublicKey, error) {
 func NewProviderWithKeyURL(t, keyURL string) (Provider, []PublicKey, error) {
 	kid, err := uuid.NewString()
 	if err != nil {
-		return nil, nil, err
+		return Provider{}, nil, err
 	}
 	k, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
-		return nil, nil, err
+		return Provider{}, nil, err
 	}
 	var p Provider
 	switch t {
 	case RS256:
-		p = RS256Provider{k, &k.PublicKey, kid, keyURL, true, true}
+		p = Provider{RS256, crypto.SHA256, KeySet{k, &k.PublicKey, kid, keyURL, true, true}}
 	case RS384:
-		p = RS384Provider{k, &k.PublicKey, kid, keyURL, true, true}
+		p = Provider{RS384, crypto.SHA384, KeySet{k, &k.PublicKey, kid, keyURL, true, true}}
 	case RS512:
-		p = RS512Provider{k, &k.PublicKey, kid, keyURL, true, true}
+		p = Provider{RS512, crypto.SHA512, KeySet{k, &k.PublicKey, kid, keyURL, true, true}}
 	default:
-		return nil, nil, errors.New("type string invalid")
+		return Provider{}, nil, errors.New("type string invalid")
 	}
 	pub, err := x509.MarshalPKIXPublicKey(&k.PublicKey)
 	if err != nil {
-		return nil, nil, err
+		return Provider{}, nil, err
 	}
 	return p, []PublicKey{PublicKey{pub, kid}}, nil
 }
@@ -68,74 +74,40 @@ func NewProviderWithKeyURL(t, keyURL string) (Provider, []PublicKey, error) {
 func LoadProvider(k KeySet, t string) Provider {
 	switch t {
 	case RS256:
-		return RS256Provider(k)
+		return Provider{RS256, crypto.SHA256, k}
 	case RS384:
-		return RS384Provider(k)
+		return Provider{RS384, crypto.SHA384, k}
 	case RS512:
-		return RS512Provider(k)
+		return Provider{RS512, crypto.SHA512, k}
 	}
-	return nil
+	return Provider{}
 }
 
-// RS256Provider provides RSA PKCS#1 v1.5 using SHA256 JWS signing and verification
-type RS256Provider KeySet
-
 // Header sets the necessary JWT header fields
-func (p RS256Provider) Header(h *jwt.Header) {
-	h.Alg = RS256
-	KeySet(p).header(h)
+func (p Provider) Header(h *jwt.Header) {
+	h.Alg = p.alg
+	if p.set.kid != "" {
+		h.Kid = p.set.kid
+	}
+	if p.set.jku != "" {
+		h.Jku = p.set.jku
+	}
 }
 
 // Sign signs the content of a JWT
-func (p RS256Provider) Sign(c []byte) []byte {
-	hash := sha256.Sum256(c)
-	return KeySet(p).sign(crypto.SHA256, hash[:])
+func (p Provider) Sign(c []byte) []byte {
+	hash := p.hash.New()
+	hash.Write(c)
+	sum, err := rsa.SignPKCS1v15(rand.Reader, p.set.private, p.hash, hash.Sum(nil))
+	if err != nil {
+		return nil
+	}
+	return sum
 }
 
 // Verify verifies if the content matches it's signature.
-func (p RS256Provider) Verify(data, sig []byte, h jwt.Header) bool {
-	hash := sha256.Sum256(data)
-	return rsa.VerifyPKCS1v15(p.public, crypto.SHA256, hash[:], sig) == nil
-}
-
-// RS384Provider provides RSA PKCS#1 v1.5 using SHA384 JWS signing and verification
-type RS384Provider KeySet
-
-// Header sets the necessary JWT header fields
-func (p RS384Provider) Header(h *jwt.Header) {
-	h.Alg = RS384
-	KeySet(p).header(h)
-}
-
-// Sign signs the content of a JWT
-func (p RS384Provider) Sign(c []byte) []byte {
-	hash := sha512.Sum384(c)
-	return KeySet(p).sign(crypto.SHA384, hash[:])
-}
-
-// Verify verifies if the content matches it's signature.
-func (p RS384Provider) Verify(data, sig []byte, h jwt.Header) bool {
-	hash := sha512.Sum384(data)
-	return rsa.VerifyPKCS1v15(p.public, crypto.SHA384, hash[:], sig) == nil
-}
-
-// RS512Provider provides RSA PKCS#1 v1.5 using SHA512 JWS signing and verification
-type RS512Provider KeySet
-
-// Header sets the necessary JWT header fields
-func (p RS512Provider) Header(h *jwt.Header) {
-	h.Alg = RS512
-	KeySet(p).header(h)
-}
-
-// Sign signs the content of a JWT
-func (p RS512Provider) Sign(c []byte) []byte {
-	hash := sha512.Sum512(c)
-	return KeySet(p).sign(crypto.SHA512, hash[:])
-}
-
-// Verify verifies if the content matches it's signature.
-func (p RS512Provider) Verify(data, sig []byte, h jwt.Header) bool {
-	hash := sha512.Sum512(data)
-	return rsa.VerifyPKCS1v15(p.public, crypto.SHA512, hash[:], sig) == nil
+func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
+	hash := p.hash.New()
+	hash.Write(data)
+	return rsa.VerifyPKCS1v15(p.set.public, p.hash, hash.Sum(nil), sig) == nil
 }

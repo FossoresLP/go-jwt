@@ -1,13 +1,9 @@
 package rs
 
 import (
-	"crypto"
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"errors"
-
-	"github.com/fossoreslp/go-jwt"
 )
 
 // KeySet stores the key for an algorithm
@@ -18,23 +14,6 @@ type KeySet struct {
 	jku       string
 	canSign   bool
 	canVerify bool
-}
-
-func (ks KeySet) header(h *jwt.Header) {
-	if ks.kid != "" {
-		h.Kid = ks.kid
-	}
-	if ks.jku != "" {
-		h.Jku = ks.jku
-	}
-}
-
-func (ks KeySet) sign(alg crypto.Hash, hash []byte) []byte {
-	sum, err := rsa.SignPKCS1v15(rand.Reader, ks.private, alg, hash)
-	if err != nil {
-		return nil
-	}
-	return sum
 }
 
 // SetKeys sets the key
