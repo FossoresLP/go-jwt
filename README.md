@@ -11,7 +11,9 @@ This packages implements JSON Web Token as defined in [RFC 7519](https://tools.i
 
 This package is not capable of validating signatures on it's own. It is made to be modular and needs packages that provide their own signature algorithms.
 
-The default algorithms can be found in sub-packages in this repository. Only EdDSA and HS are currently available, all others are WIP.
+The default algorithms specified in [RFC7518](https://tools.ietf.org/html/rfc7518) and [RFC8037](https://tools.ietf.org/html/rfc8037) can be found in sub-packages in this repository.
+
+Only EdDSA with Ed25519 and Ed448 (unstable), HMAC-SHA2 and RSA PKCS#1 v1.5 are currently available, ECDSA and RSA-PSS are WIP.
 
 Data structures
 ---------------
