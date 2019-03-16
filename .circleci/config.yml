@@ -17,7 +17,7 @@ jobs:
           command: go test -v ./alg-hs 2>&1 | go-junit-report > test-results/report-hs.xml
       - run:
           name: RS provider unit tests
-          command: go test -v ./alg-rs 2>&1 | go-junit-report > test-results/report-rs.xml
+          command: go test -v ./alg-rs
       - run:
           name: EdDSA provider unit tests
           command: go test -v ./alg-eddsa 2>&1 | go-junit-report > test-results/report-eddsa.xml
