@@ -61,7 +61,13 @@ func (ks *KeySet) SetKeyURL(jku string) {
 
 // GetPublicKey returns the public key of the keyset
 func (ks KeySet) GetPublicKey() PublicKey {
-	b, _ := x509.MarshalPKIXPublicKey(ks.public)
+	if ks.public == nil {
+		return PublicKey{}
+	}
+	b, err := x509.MarshalPKIXPublicKey(ks.public)
+	if err != nil {
+		return PublicKey{}
+	}
 	return PublicKey{b, ks.kid}
 }
 

@@ -24,7 +24,7 @@ const (
 	RS512 = "RS512"
 )
 
-// init is only here to make sure the imports for SHA256, SHA384 and SHA512 are not removed automatically and therefore available to hash.Hash
+// init is only here to make sure the imports for SHA256, SHA384 and SHA512 are not removed automatically and the are therefore available to hash.Hash
 func init() {
 	_ = sha256.New()
 	_ = sha512.New()
