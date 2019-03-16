@@ -16,6 +16,9 @@ jobs:
           name: HS provider unit tests
           command: go test -v ./alg-hs 2>&1 | go-junit-report > test-results/report-hs.xml
       - run:
+          name: RS provider unit tests
+          command: go test -v ./alg-rs 2>&1 | go-junit-report > test-results/report-rs.xml
+      - run:
           name: EdDSA provider unit tests
           command: go test -v ./alg-eddsa 2>&1 | go-junit-report > test-results/report-eddsa.xml
       - run:
@@ -34,7 +37,7 @@ jobs:
       - run: chmod +x uploader.run
       - run:
           name: Calculate coverage
-          command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-eddsa ./publickey
+          command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-rs ./alg-eddsa ./publickey
       - run:
           name: Upload coverage
           command: ./uploader.run
