@@ -4,6 +4,8 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"errors"
+
+	"github.com/fossoreslp/go-jwt/publickey"
 )
 
 // KeySet stores the key for an algorithm
@@ -60,29 +62,13 @@ func (ks *KeySet) SetKeyURL(jku string) {
 }
 
 // GetPublicKey returns the public key of the keyset
-func (ks KeySet) GetPublicKey() PublicKey {
+func (ks KeySet) GetPublicKey() publickey.PublicKey {
 	if ks.public == nil {
-		return PublicKey{}
+		return publickey.PublicKey{}
 	}
 	b, err := x509.MarshalPKIXPublicKey(ks.public)
 	if err != nil {
-		return PublicKey{}
+		return publickey.PublicKey{}
 	}
-	return PublicKey{b, ks.kid}
-}
-
-// PublicKey represents a public key
-type PublicKey struct {
-	key []byte
-	kid string
-}
-
-// GetPublicKey returns the key as a byte slice
-func (s PublicKey) GetPublicKey() []byte {
-	return s.key
-}
-
-// GetKeyID returns the keys ID
-func (s PublicKey) GetKeyID() string {
-	return s.kid
+	return publickey.New(b, ks.kid)
 }
