@@ -122,6 +122,7 @@ func (p Provider) Sign(c []byte) []byte {
 	rb := r.Bytes()
 	sb := s.Bytes()
 
+	// This should not be needed as no curve should return too many bytes but I'll leave it here because I'm not able to verify that behavior.
 	if len(rb) > p.ilen {
 		rb = rb[len(rb)-p.ilen:]
 	}
