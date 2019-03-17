@@ -39,7 +39,7 @@ var (
 	c521 = curve{ES512, elliptic.P521(), crypto.SHA512, 66}
 )
 
-// init is only here to make sure the imports for SHA256, SHA384 and SHA512 are not removed automatically and the are therefore available to hash.Hash
+// init is only here to make sure the imports for SHA256, SHA384 and SHA512 are not removed automatically and are therefore available to hash.Hash
 func init() {
 	_ = sha256.New()
 	_ = sha512.New()
@@ -144,11 +144,9 @@ func (p Provider) Sign(c []byte) []byte {
 // Verify verifies if the content matches it's signature.
 func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
 	if !p.set.canVerify {
-		println("!canVerify")
 		return false
 	}
 	if len(sig) != 2*p.ilen {
-		println("len(sig) != 64")
 		return false
 	}
 	hash := p.hash.New()
