@@ -9,11 +9,11 @@ Modular JWT / JWS provider in Golang
 
 This packages implements JSON Web Token as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519) in Go.
 
-This package is not capable of validating signatures on it's own. It is made to be modular and needs packages that provide their own signature algorithms.
+This package is not capable of validating signatures on it's own. It has a modular architecture and needs modules providing signature algorithms.
 
 The default algorithms specified in [RFC7518](https://tools.ietf.org/html/rfc7518) and [RFC8037](https://tools.ietf.org/html/rfc8037) can be found in sub-packages in this repository.
 
-EdDSA with Ed25519 and Ed448 (unstable), HMAC-SHA2, RSA PKCS#1 v1.5 and RSA-PSS are currently available, ECDSA is still WIP.
+EdDSA with Ed25519 and Ed448 (unstable), HMAC-SHA2, RSA PKCS#1 v1.5, RSA-PSS and ECDSA can all be found in the respective folders.
 
 Data structures
 ---------------

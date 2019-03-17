@@ -105,7 +105,7 @@ func TestProvider_Sign(t *testing.T) {
 }
 
 func TestProvider_Verify(t *testing.T) {
-	p := Provider{set: KeySet{canSign: false}}
+	p := Provider{set: KeySet{canVerify: false}}
 	if p.Verify(nil, nil, jwt.Header{}) != false {
 		t.Error("Verify() did not return false when canVerify is false")
 	}
