@@ -13,7 +13,7 @@ This package is not capable of validating signatures on it's own. It is made to 
 
 The default algorithms specified in [RFC7518](https://tools.ietf.org/html/rfc7518) and [RFC8037](https://tools.ietf.org/html/rfc8037) can be found in sub-packages in this repository.
 
-EdDSA with Ed25519 and Ed448 (unstable), HMAC-SHA2 RSA PKCS#1 v1.5 and RSA-PSS are currently available, ECDSA is still WIP.
+EdDSA with Ed25519 and Ed448 (unstable), HMAC-SHA2, RSA PKCS#1 v1.5 and RSA-PSS are currently available, ECDSA is still WIP.
 
 Data structures
 ---------------
