@@ -107,11 +107,14 @@ func (p Provider) Sign(c []byte) ([]byte, error) {
 }
 
 // Verify verifies if the content matches it's signature.
-func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
+func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 	if !p.set.canVerify {
-		return false
+		return errors.New("keyset does not allow validation")
 	}
 	hash := p.pssopts.Hash.New()
 	hash.Write(data)
-	return rsa.VerifyPSS(p.set.public, p.pssopts.Hash, hash.Sum(nil), sig, p.pssopts) == nil
+	if rsa.VerifyPSS(p.set.public, p.pssopts.Hash, hash.Sum(nil), sig, p.pssopts) == nil {
+		return nil
+	}
+	return errors.New("signature invalid")
 }

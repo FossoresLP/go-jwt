@@ -16,8 +16,11 @@ func (alg TestAlgorithm) Sign(data []byte) ([]byte, error) {
 	return append([]byte(alg), data...), nil
 }
 
-func (alg TestAlgorithm) Verify(data, hash []byte, h Header) bool {
-	return len(hash) == len(data)+len(alg)
+func (alg TestAlgorithm) Verify(data, hash []byte, h Header) error {
+	if len(hash) == len(data)+len(alg) {
+		return nil
+	}
+	return errors.New("token invalid")
 }
 
 func (alg TestAlgorithm) Header(h *Header) {

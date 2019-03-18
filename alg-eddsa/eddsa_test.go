@@ -154,15 +154,15 @@ func TestProvider_Sign(t *testing.T) {
 
 func TestProvider_Verify(t *testing.T) {
 	p25519 := Provider{Ed25519KeySet{canVerify: false}, Ed448KeySet{}, ed448.NewCurve(), ""}
-	if p25519.Verify(nil, nil, jwt.Header{Crv: Ed25519}) != false {
+	if p25519.Verify(nil, nil, jwt.Header{Crv: Ed25519}) == nil {
 		t.Error("Provider.Verify() should fail because canVerify is false for specified curve")
 	}
 	p448 := Provider{Ed25519KeySet{}, Ed448KeySet{canVerify: false}, ed448.NewCurve(), ""}
-	if p448.Verify(nil, nil, jwt.Header{Crv: Ed448}) != false {
+	if p448.Verify(nil, nil, jwt.Header{Crv: Ed448}) == nil {
 		t.Error("Provider.Verify() should fail because canVerify is false for specified curve")
 	}
 	punknown := Provider{Ed25519KeySet{}, Ed448KeySet{}, ed448.NewCurve(), ""}
-	if punknown.Verify(nil, nil, jwt.Header{Crv: "unknown"}) != false {
+	if punknown.Verify(nil, nil, jwt.Header{Crv: "unknown"}) == nil {
 		t.Error("Provider.Verify() should fail because specified curve is unknown")
 	}
 }

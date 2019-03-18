@@ -19,8 +19,8 @@ func (jwt JWT) validate(data, signature []byte) error {
 	}
 
 	// Check the hash using the Verify function of the algorithm declared by the header
-	if !alg.Verify(data, signature, jwt.Header) {
-		return errors.New("hash does not match content")
+	if err := alg.Verify(data, signature, jwt.Header); err != nil {
+		return err
 	}
 
 	return checkTimestamps(jwt.Content)

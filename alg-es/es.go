@@ -143,12 +143,12 @@ func (p Provider) Sign(c []byte) ([]byte, error) {
 }
 
 // Verify verifies if the content matches it's signature.
-func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
+func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 	if !p.set.canVerify {
-		return false
+		return errors.New("keyset does not allow validation")
 	}
 	if len(sig) != 2*p.ilen {
-		return false
+		return errors.New("signature invalid")
 	}
 	hash := p.hash.New()
 	hash.Write(data)
@@ -156,5 +156,8 @@ func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
 	s := big.Int{}
 	r.SetBytes(sig[:p.ilen])
 	s.SetBytes(sig[p.ilen:])
-	return ecdsa.Verify(p.set.public, hash.Sum(nil), &r, &s)
+	if ecdsa.Verify(p.set.public, hash.Sum(nil), &r, &s) {
+		return nil
+	}
+	return errors.New("signature invalid")
 }

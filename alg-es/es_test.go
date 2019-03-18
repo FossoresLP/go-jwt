@@ -119,12 +119,12 @@ func TestProvider_Sign(t *testing.T) {
 
 func TestProvider_Verify(t *testing.T) {
 	p := Provider{set: KeySet{canVerify: false}}
-	if p.Verify(nil, nil, jwt.Header{}) != false {
-		t.Error("Verify() did not return false when canVerify is false")
+	if p.Verify(nil, nil, jwt.Header{}) == nil {
+		t.Error("Verify() did not return an error when canVerify is false")
 	}
 	p = Provider{set: KeySet{canVerify: true}, ilen: 16}
 	b := [12]byte{0xFF}
-	if p.Verify(nil, b[:], jwt.Header{}) != false {
-		t.Error("Verify() did not return false when signature has wrong length")
+	if p.Verify(nil, b[:], jwt.Header{}) == nil {
+		t.Error("Verify() did not return an error when signature has wrong length")
 	}
 }

@@ -104,20 +104,26 @@ func (p Provider) Sign(c []byte) ([]byte, error) {
 }
 
 // Verify verifies if the content matches it's signature. The curve to use is set by the header.
-func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
+func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 	switch h.Crv {
 	case Ed25519:
 		if !p.ed25519keyset.canVerify {
-			return false
+			return errors.New("keyset does not allow validation")
 		}
-		return ed25519.Verify(p.ed25519keyset.public, data, sig)
+		if ed25519.Verify(p.ed25519keyset.public, data, sig) {
+			return nil
+		}
+		return errors.New("signature invalid")
 	case Ed448:
 		if !p.ed448keyset.canVerify {
-			return false
+			return errors.New("keyset does not allow validation")
 		}
 		var signature [112]byte
 		copy(signature[:], sig)
-		return p.ed448curve.Verify(signature, data, p.ed448keyset.public)
+		if p.ed448curve.Verify(signature, data, p.ed448keyset.public) {
+			return nil
+		}
+		return errors.New("signature invalid")
 	}
-	return false
+	return errors.New("unknown curve")
 }

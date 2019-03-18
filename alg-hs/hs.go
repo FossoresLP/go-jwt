@@ -105,7 +105,10 @@ func (p Provider) Sign(c []byte) ([]byte, error) {
 }
 
 // Verify verifies if the content matches it's signature.
-func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
+func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 	expectedMAC := p.getMAC(data)
-	return hmac.Equal(sig, expectedMAC)
+	if hmac.Equal(sig, expectedMAC) {
+		return nil
+	}
+	return errors.New("signature invalid")
 }

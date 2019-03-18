@@ -19,6 +19,6 @@ type JWT struct {
 // Algorithm is an interface for algorithms used to sign and validate a JWS
 type Algorithm interface {
 	Sign([]byte) ([]byte, error)
-	Verify([]byte, []byte, Header) bool
+	Verify([]byte, []byte, Header) error
 	Header(*Header)
 }

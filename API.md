@@ -49,7 +49,7 @@ A `Provider` has to implement the following functionality:
 
 `Sign(data []byte) (signature []byte, err error)` has to return the (not base64-encoded) signature the algorithm generates for the data provided as the input and an error to indicate whether signing was successful.
 
-`Verify(data, signature []byte, h Header) (err error)` has to return an error indicating whether the signature could be validated. The header can be accessed for additional data.
+`Verify(data, signature []byte, h Header) (err error)` has to return an error indicating whether the signature could be validated. The header can be accessed for additional data. The error may present information about an internal issue with validating like a missing key but an invalid signature must be indicated only by returning `errors.New("signature invalid")`. This is for security purposes as a developer may want to forward this error to the user and too much information about the verification process could cause issues.
 
 `Header(h *Header)` has to set the necessary header parameters to indicate the used algorithm. It must also set the key ID and key URL in case the key designated for signing has any.
 
