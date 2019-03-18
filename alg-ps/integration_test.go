@@ -16,7 +16,7 @@ func TestPS256(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm(PS256, p)
-	jwt.DefaultAlgorithm(PS256)
+	jwt.DefaultAlgorithm(PS256) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -41,7 +41,7 @@ func TestPS384(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm(PS384, p)
-	jwt.DefaultAlgorithm(PS384)
+	jwt.DefaultAlgorithm(PS384) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -66,7 +66,7 @@ func TestPS512(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm(PS512, p)
-	jwt.DefaultAlgorithm(PS512)
+	jwt.DefaultAlgorithm(PS512) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -102,7 +102,7 @@ o2kQ+X5xK9cipRgEKwIDAQAB
 	}
 	p, _ := LoadProvider(ks, PS384)
 	jwt.SetAlgorithm(PS384, p)
-	jwt.DefaultAlgorithm(PS384)
+	jwt.DefaultAlgorithm(PS384) // nolint:errcheck
 	dec, err := jwt.Decode(token)
 	if err != nil {
 		t.Errorf("Could not decode JWT: %s", err.Error())

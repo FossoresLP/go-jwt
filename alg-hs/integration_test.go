@@ -21,7 +21,7 @@ func TestHS256(t *testing.T) {
 	base64.StdEncoding.Encode(bk, rk)
 	t.Logf("Created provider with key: %s", string(bk))
 	jwt.SetAlgorithm(HS256, p)
-	jwt.DefaultAlgorithm(HS256)
+	jwt.DefaultAlgorithm(HS256) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -47,7 +47,7 @@ func TestHS384(t *testing.T) {
 	base64.StdEncoding.Encode(bk, rk)
 	t.Logf("Created provider with key: %s", string(bk))
 	jwt.SetAlgorithm(HS384, p)
-	jwt.DefaultAlgorithm(HS384)
+	jwt.DefaultAlgorithm(HS384) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -73,7 +73,7 @@ func TestHS512(t *testing.T) {
 	base64.StdEncoding.Encode(bk, rk)
 	t.Logf("Created provider with key: %s", string(bk))
 	jwt.SetAlgorithm(HS512, p)
-	jwt.DefaultAlgorithm(HS512)
+	jwt.DefaultAlgorithm(HS512) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {

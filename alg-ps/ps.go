@@ -98,7 +98,8 @@ func (p Provider) Sign(c []byte) ([]byte, error) {
 		return nil, errors.New("keyset does not allow signing")
 	}
 	hash := p.pssopts.Hash.New()
-	hash.Write(c)
+	// SHA2 does not return errors
+	hash.Write(c) // nolint:errcheck
 	sum, err := rsa.SignPSS(rand.Reader, p.set.private, p.pssopts.Hash, hash.Sum(nil), p.pssopts)
 	if err != nil {
 		return nil, err
@@ -112,7 +113,8 @@ func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 		return errors.New("keyset does not allow validation")
 	}
 	hash := p.pssopts.Hash.New()
-	hash.Write(data)
+	// SHA2 does not return errors
+	hash.Write(data) // nolint:errcheck
 	if rsa.VerifyPSS(p.set.public, p.pssopts.Hash, hash.Sum(nil), sig, p.pssopts) == nil {
 		return nil
 	}

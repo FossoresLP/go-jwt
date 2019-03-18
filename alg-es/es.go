@@ -113,7 +113,8 @@ func (p Provider) Sign(c []byte) ([]byte, error) {
 		return nil, errors.New("keyset does not allow signing")
 	}
 	hash := p.hash.New()
-	hash.Write(c)
+	// SHA2 does not return errors
+	hash.Write(c) // nolint:errcheck
 	r, s, err := ecdsa.Sign(rand.Reader, p.set.private, hash.Sum(nil))
 	if err != nil {
 		return nil, err
@@ -151,7 +152,8 @@ func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 		return errors.New("signature invalid")
 	}
 	hash := p.hash.New()
-	hash.Write(data)
+	// SHA2 does not return errors
+	hash.Write(data) // nolint:errcheck
 	r := big.Int{}
 	s := big.Int{}
 	r.SetBytes(sig[:p.ilen])

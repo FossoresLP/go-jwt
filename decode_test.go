@@ -7,7 +7,7 @@ import (
 
 func TestDecode(t *testing.T) {
 	SetAlgorithm("test", TestAlgorithm("test"))
-	DefaultAlgorithm("test")
+	DefaultAlgorithm("test") // nolint:errcheck
 	tests := []struct {
 		name     string
 		token    []byte

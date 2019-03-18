@@ -12,7 +12,7 @@ func TestEd25519(t *testing.T) {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
 	jwt.SetAlgorithm("EdDSA", p)
-	jwt.DefaultAlgorithm("EdDSA")
+	jwt.DefaultAlgorithm("EdDSA") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -34,7 +34,7 @@ func TestEd448(t *testing.T) {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
 	jwt.SetAlgorithm("EdDSA", p)
-	jwt.DefaultAlgorithm("EdDSA")
+	jwt.DefaultAlgorithm("EdDSA") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {

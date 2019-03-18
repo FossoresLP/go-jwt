@@ -84,7 +84,8 @@ func LoadProvider(k KeySet, t string) (Provider, error) {
 
 func (p Provider) getMAC(in []byte) []byte {
 	p.hmac.Reset()
-	p.hmac.Write(in)
+	// HMAC only returns the error of SHA2 which itself does not return an error
+	p.hmac.Write(in) // nolint:errcheck
 	return p.hmac.Sum(nil)
 }
 

@@ -40,7 +40,7 @@ func Decode(in []byte) (data JWT, err error) {
 
 	// Decode Hash
 	signature := make([]byte, base64.RawURLEncoding.DecodedLen(len(sections[2])))
-	if n, e := base64.RawURLEncoding.Decode(signature, sections[2]); e != nil || n < 1 || signature == nil {
+	if n, e := base64.RawURLEncoding.Decode(signature, sections[2]); e != nil || n < 1 {
 		err = errors.New("hash invalid")
 		return
 	}

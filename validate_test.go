@@ -26,7 +26,7 @@ func TestJWT_Valid(t *testing.T) {
 func TestHeader_getAlgorithm(t *testing.T) {
 	alg := TestAlgorithm("test")
 	SetAlgorithm("test", alg)
-	DefaultAlgorithm("test")
+	DefaultAlgorithm("test") // nolint:errcheck
 	tests := []struct {
 		name    string
 		h       Header
