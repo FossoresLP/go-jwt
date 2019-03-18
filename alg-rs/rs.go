@@ -69,16 +69,16 @@ func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, e
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(k KeySet, t string) Provider {
+func LoadProvider(k KeySet, t string) (Provider, error) {
 	switch t {
 	case RS256:
-		return Provider{RS256, crypto.SHA256, k}
+		return Provider{RS256, crypto.SHA256, k}, nil
 	case RS384:
-		return Provider{RS384, crypto.SHA384, k}
+		return Provider{RS384, crypto.SHA384, k}, nil
 	case RS512:
-		return Provider{RS512, crypto.SHA512, k}
+		return Provider{RS512, crypto.SHA512, k}, nil
 	}
-	return Provider{}
+	return Provider{}, errors.New("type string invalid")
 }
 
 // Header sets the necessary JWT header fields
@@ -93,25 +93,28 @@ func (p Provider) Header(h *jwt.Header) {
 }
 
 // Sign signs the content of a JWT
-func (p Provider) Sign(c []byte) []byte {
+func (p Provider) Sign(c []byte) ([]byte, error) {
 	if !p.set.canSign {
-		return nil
+		return nil, errors.New("keyset does not allow signing")
 	}
 	hash := p.hash.New()
 	hash.Write(c)
 	sum, err := rsa.SignPKCS1v15(rand.Reader, p.set.private, p.hash, hash.Sum(nil))
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return sum
+	return sum, nil
 }
 
 // Verify verifies if the content matches it's signature.
-func (p Provider) Verify(data, sig []byte, _ jwt.Header) bool {
+func (p Provider) Verify(data, sig []byte, _ jwt.Header) error {
 	if !p.set.canVerify {
-		return false
+		return errors.New("keyset does not allow validation")
 	}
 	hash := p.hash.New()
 	hash.Write(data)
-	return rsa.VerifyPKCS1v15(p.set.public, p.hash, hash.Sum(nil), sig) == nil
+	if rsa.VerifyPKCS1v15(p.set.public, p.hash, hash.Sum(nil), sig) == nil {
+		return nil
+	}
+	return errors.New("signature invalid")
 }

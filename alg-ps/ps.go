@@ -69,16 +69,16 @@ func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, e
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(k KeySet, t string) Provider {
+func LoadProvider(k KeySet, t string) (Provider, error) {
 	switch t {
 	case PS256:
-		return Provider{PS256, &rsa.PSSOptions{SaltLength: 32, Hash: crypto.SHA256}, k}
+		return Provider{PS256, &rsa.PSSOptions{SaltLength: 32, Hash: crypto.SHA256}, k}, nil
 	case PS384:
-		return Provider{PS384, &rsa.PSSOptions{SaltLength: 48, Hash: crypto.SHA384}, k}
+		return Provider{PS384, &rsa.PSSOptions{SaltLength: 48, Hash: crypto.SHA384}, k}, nil
 	case PS512:
-		return Provider{PS512, &rsa.PSSOptions{SaltLength: 64, Hash: crypto.SHA512}, k}
+		return Provider{PS512, &rsa.PSSOptions{SaltLength: 64, Hash: crypto.SHA512}, k}, nil
 	}
-	return Provider{}
+	return Provider{}, errors.New("type string invalid")
 }
 
 // Header sets the necessary JWT header fields
@@ -93,25 +93,28 @@ func (p Provider) Header(h *jwt.Header) {
 }
 
 // Sign signs the content of a JWT
-func (p Provider) Sign(c []byte) []byte {
+func (p Provider) Sign(c []byte) ([]byte, error) {
 	if !p.set.canSign {
-		return nil
+		return nil, errors.New("keyset does not allow signing")
 	}
 	hash := p.pssopts.Hash.New()
 	hash.Write(c)
 	sum, err := rsa.SignPSS(rand.Reader, p.set.private, p.pssopts.Hash, hash.Sum(nil), p.pssopts)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return sum
+	return sum, nil
 }
 
 // Verify verifies if the content matches it's signature.
-func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
+func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 	if !p.set.canVerify {
-		return false
+		return errors.New("keyset does not allow validation")
 	}
 	hash := p.pssopts.Hash.New()
 	hash.Write(data)
-	return rsa.VerifyPSS(p.set.public, p.pssopts.Hash, hash.Sum(nil), sig, p.pssopts) == nil
+	if rsa.VerifyPSS(p.set.public, p.pssopts.Hash, hash.Sum(nil), sig, p.pssopts) == nil {
+		return nil
+	}
+	return errors.New("signature invalid")
 }

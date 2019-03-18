@@ -13,7 +13,7 @@ func New(content []byte) JWT {
 }
 
 // Encode a JWT to a byte slice
-func (t JWT) Encode() (result []byte, err error) {
+func (t JWT) Encode() ([]byte, error) {
 	if defaultAlgorithm == "" {
 		return nil, errors.New("default algorithm is not set - cannot sign JWT")
 	}
@@ -24,9 +24,12 @@ func (t JWT) Encode() (result []byte, err error) {
 	alg.Header(&t.Header)
 	header := encodeHeader(t.Header)
 	content := b64encode(t.Content)
-	hash := b64encode(alg.Sign(join(header, content)))
-	result = join(header, content, hash)
-	return
+	sig, err := alg.Sign(join(header, content))
+	if err != nil {
+		return nil, err
+	}
+	hash := b64encode(sig)
+	return join(header, content, hash), nil
 }
 
 func b64encode(data []byte) []byte {

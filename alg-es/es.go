@@ -84,16 +84,16 @@ func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, e
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(k KeySet, t string) Provider {
+func LoadProvider(k KeySet, t string) (Provider, error) {
 	switch t {
 	case ES256:
-		return Provider{ES256, crypto.SHA256, k, 32}
+		return Provider{ES256, crypto.SHA256, k, 32}, nil
 	case ES384:
-		return Provider{ES384, crypto.SHA384, k, 48}
+		return Provider{ES384, crypto.SHA384, k, 48}, nil
 	case ES512:
-		return Provider{ES512, crypto.SHA512, k, 66}
+		return Provider{ES512, crypto.SHA512, k, 66}, nil
 	}
-	return Provider{}
+	return Provider{}, errors.New("type string invalid")
 }
 
 // Header sets the necessary JWT header fields
@@ -108,15 +108,15 @@ func (p Provider) Header(h *jwt.Header) {
 }
 
 // Sign signs the content of a JWT
-func (p Provider) Sign(c []byte) []byte {
+func (p Provider) Sign(c []byte) ([]byte, error) {
 	if !p.set.canSign {
-		return nil
+		return nil, errors.New("keyset does not allow signing")
 	}
 	hash := p.hash.New()
 	hash.Write(c)
 	r, s, err := ecdsa.Sign(rand.Reader, p.set.private, hash.Sum(nil))
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	rb := r.Bytes()
@@ -139,16 +139,16 @@ func (p Provider) Sign(c []byte) []byte {
 		sb = append(p, sb...)
 	}
 
-	return append(rb, sb...)
+	return append(rb, sb...), nil
 }
 
 // Verify verifies if the content matches it's signature.
-func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
+func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 	if !p.set.canVerify {
-		return false
+		return errors.New("keyset does not allow validation")
 	}
 	if len(sig) != 2*p.ilen {
-		return false
+		return errors.New("signature invalid")
 	}
 	hash := p.hash.New()
 	hash.Write(data)
@@ -156,5 +156,8 @@ func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
 	s := big.Int{}
 	r.SetBytes(sig[:p.ilen])
 	s.SetBytes(sig[p.ilen:])
-	return ecdsa.Verify(p.set.public, hash.Sum(nil), &r, &s)
+	if ecdsa.Verify(p.set.public, hash.Sum(nil), &r, &s) {
+		return nil
+	}
+	return errors.New("signature invalid")
 }

@@ -89,18 +89,20 @@ func Test_encodeHeader(t *testing.T) {
 }
 
 func TestJWT_Encode(t *testing.T) {
-	SetAlgorithm("test", TestAlgorithm("test"))
-	DefaultAlgorithm("test")
 	tests := []struct {
 		name       string
 		t          JWT
+		alg        Algorithm
 		wantResult []byte
 		wantErr    bool
 	}{
-		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}, []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), false},
+		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}, TestAlgorithm("test"), []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ.dGVzdGV5SjBlWEFpT2lKS1YxUWlMQ0poYkdjaU9pSjBaWE4wSW4wLmV5SnVZVzFsSWpvaWRHVnpkQ0lzSW5WelpTSTZJblJsYzNScGJtY2lmUQ"), false},
+		{"Fail", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}, TestAlgorithm("error"), nil, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			SetAlgorithm("test", tt.alg)
+			DefaultAlgorithm("test")
 			gotResult, err := tt.t.Encode()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("JWT.Encode() error = %v, wantErr %v", err, tt.wantErr)

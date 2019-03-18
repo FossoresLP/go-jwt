@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -8,12 +9,18 @@ import (
 
 type TestAlgorithm string
 
-func (alg TestAlgorithm) Sign(data []byte) []byte {
-	return append([]byte(alg), data...)
+func (alg TestAlgorithm) Sign(data []byte) ([]byte, error) {
+	if string(alg) == "error" {
+		return nil, errors.New("Here's the error you requested")
+	}
+	return append([]byte(alg), data...), nil
 }
 
-func (alg TestAlgorithm) Verify(data, hash []byte, h Header) bool {
-	return len(hash) == len(data)+len(alg)
+func (alg TestAlgorithm) Verify(data, hash []byte, h Header) error {
+	if len(hash) == len(data)+len(alg) {
+		return nil
+	}
+	return errors.New("token invalid")
 }
 
 func (alg TestAlgorithm) Header(h *Header) {
