@@ -84,16 +84,16 @@ func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, e
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(k KeySet, t string) Provider {
+func LoadProvider(k KeySet, t string) (Provider, error) {
 	switch t {
 	case ES256:
-		return Provider{ES256, crypto.SHA256, k, 32}
+		return Provider{ES256, crypto.SHA256, k, 32}, nil
 	case ES384:
-		return Provider{ES384, crypto.SHA384, k, 48}
+		return Provider{ES384, crypto.SHA384, k, 48}, nil
 	case ES512:
-		return Provider{ES512, crypto.SHA512, k, 66}
+		return Provider{ES512, crypto.SHA512, k, 66}, nil
 	}
-	return Provider{}
+	return Provider{}, errors.New("type string invalid")
 }
 
 // Header sets the necessary JWT header fields

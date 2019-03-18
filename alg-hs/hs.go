@@ -70,16 +70,16 @@ func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, e
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(k KeySet, t string) Provider {
+func LoadProvider(k KeySet, t string) (Provider, error) {
 	switch t {
 	case HS256:
-		return Provider{HS256, hmac.New(sha256.New, k.key), k}
+		return Provider{HS256, hmac.New(sha256.New, k.key), k}, nil
 	case HS384:
-		return Provider{HS384, hmac.New(sha512.New384, k.key), k}
+		return Provider{HS384, hmac.New(sha512.New384, k.key), k}, nil
 	case HS512:
-		return Provider{HS512, hmac.New(sha512.New, k.key), k}
+		return Provider{HS512, hmac.New(sha512.New, k.key), k}, nil
 	}
-	return Provider{}
+	return Provider{}, errors.New("type string is invalid")
 }
 
 func (p Provider) getMAC(in []byte) []byte {

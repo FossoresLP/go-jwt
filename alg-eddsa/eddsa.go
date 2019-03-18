@@ -52,12 +52,12 @@ func NewProviderWithKeyURL(defaultCurve, keyURL string) (Provider, []publickey.P
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(k2 Ed25519KeySet, k4 Ed448KeySet, defaultCurve string) Provider {
+func LoadProvider(k2 Ed25519KeySet, k4 Ed448KeySet, defaultCurve string) (Provider, error) {
 	if defaultCurve != Ed25519 && defaultCurve != Ed448 {
-		return Provider{}
+		return Provider{}, errors.New("unknown curve supplied as default curve")
 	}
 	c := ed448.NewCurve()
-	return Provider{k2, k4, c, defaultCurve}
+	return Provider{k2, k4, c, defaultCurve}, nil
 }
 
 // Header sets the necessary JWT header fields for the default curve

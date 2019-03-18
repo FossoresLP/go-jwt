@@ -45,18 +45,24 @@ func TestLoadProvider(t *testing.T) {
 		t string
 	}
 	tests := []struct {
-		name string
-		args args
-		want Provider
+		name    string
+		args    args
+		want    Provider
+		wantErr bool
 	}{
-		{"PS256", args{KeySet{}, PS256}, Provider{PS256, &rsa.PSSOptions{SaltLength: 32, Hash: crypto.SHA256}, KeySet{}}},
-		{"PS384", args{KeySet{}, PS384}, Provider{PS384, &rsa.PSSOptions{SaltLength: 48, Hash: crypto.SHA384}, KeySet{}}},
-		{"PS512", args{KeySet{}, PS512}, Provider{PS512, &rsa.PSSOptions{SaltLength: 64, Hash: crypto.SHA512}, KeySet{}}},
-		{"Unknown type", args{KeySet{}, "unknown"}, Provider{}},
+		{"PS256", args{KeySet{}, PS256}, Provider{PS256, &rsa.PSSOptions{SaltLength: 32, Hash: crypto.SHA256}, KeySet{}}, false},
+		{"PS384", args{KeySet{}, PS384}, Provider{PS384, &rsa.PSSOptions{SaltLength: 48, Hash: crypto.SHA384}, KeySet{}}, false},
+		{"PS512", args{KeySet{}, PS512}, Provider{PS512, &rsa.PSSOptions{SaltLength: 64, Hash: crypto.SHA512}, KeySet{}}, false},
+		{"Unknown type", args{KeySet{}, "unknown"}, Provider{}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := LoadProvider(tt.args.k, tt.args.t); !reflect.DeepEqual(got, tt.want) {
+			got, err := LoadProvider(tt.args.k, tt.args.t)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LoadProvider() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("LoadProvider() = %v, want %v", got, tt.want)
 			}
 		})

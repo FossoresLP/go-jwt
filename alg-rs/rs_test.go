@@ -45,18 +45,24 @@ func TestLoadProvider(t *testing.T) {
 		t string
 	}
 	tests := []struct {
-		name string
-		args args
-		want Provider
+		name    string
+		args    args
+		want    Provider
+		wantErr bool
 	}{
-		{"RS256", args{KeySet{}, RS256}, Provider{RS256, crypto.SHA256, KeySet{}}},
-		{"RS384", args{KeySet{}, RS384}, Provider{RS384, crypto.SHA384, KeySet{}}},
-		{"RS512", args{KeySet{}, RS512}, Provider{RS512, crypto.SHA512, KeySet{}}},
-		{"Unknown type", args{KeySet{}, "unknown"}, Provider{}},
+		{"RS256", args{KeySet{}, RS256}, Provider{RS256, crypto.SHA256, KeySet{}}, false},
+		{"RS384", args{KeySet{}, RS384}, Provider{RS384, crypto.SHA384, KeySet{}}, false},
+		{"RS512", args{KeySet{}, RS512}, Provider{RS512, crypto.SHA512, KeySet{}}, false},
+		{"Unknown type", args{KeySet{}, "unknown"}, Provider{}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := LoadProvider(tt.args.k, tt.args.t); !reflect.DeepEqual(got, tt.want) {
+			got, err := LoadProvider(tt.args.k, tt.args.t)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LoadProvider() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("LoadProvider() = %v, want %v", got, tt.want)
 			}
 		})

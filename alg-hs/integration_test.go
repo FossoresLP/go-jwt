@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/base64"
-	"reflect"
 	"testing"
 
 	"github.com/fossoreslp/go-jwt"
@@ -128,7 +127,7 @@ func TestHeader(t *testing.T) {
 }
 
 func TestLoadProvider(t *testing.T) {
-	k := LoadProvider(KeySet{kid: "key_id"}, HS256)
+	k, _ := LoadProvider(KeySet{kid: "key_id"}, HS256)
 	if k.alg != HS256 {
 		t.Errorf("LoadProvider() did not return a HS256 provider but %s", k.alg)
 	}
@@ -136,7 +135,7 @@ func TestLoadProvider(t *testing.T) {
 		t.Errorf("LoadProvider() did not pass the data from the input keyset onto the provider")
 	}
 
-	k = LoadProvider(KeySet{kid: "key_id"}, HS384)
+	k, _ = LoadProvider(KeySet{kid: "key_id"}, HS384)
 	if k.alg != HS384 {
 		t.Errorf("LoadProvider() did not return a HS384 provider but %s", k.alg)
 	}
@@ -144,7 +143,7 @@ func TestLoadProvider(t *testing.T) {
 		t.Errorf("LoadProvider() did not pass the data from the input keyset onto the provider")
 	}
 
-	k = LoadProvider(KeySet{kid: "key_id"}, HS512)
+	k, _ = LoadProvider(KeySet{kid: "key_id"}, HS512)
 	if k.alg != HS512 {
 		t.Errorf("LoadProvider() did not return a HS512 provider but %s", k.alg)
 	}
@@ -158,8 +157,8 @@ func TestUnknownAlgorithm(t *testing.T) {
 		t.Error("NewProvider() with an unknown algorithm type should fail but returned no error.")
 	}
 
-	if !reflect.DeepEqual(LoadProvider(KeySet{}, "unknown"), Provider{}) {
-		t.Error("LoadProvider() with an unknown algorithm type did not return nil.")
+	if _, err := LoadProvider(KeySet{}, "unknown"); err == nil {
+		t.Error("LoadProvider() with an unknown algorithm type did not return an error.")
 	}
 }
 

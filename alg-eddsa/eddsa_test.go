@@ -6,9 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/otrv4/ed448"
-
 	"github.com/fossoreslp/go-jwt"
+	"github.com/otrv4/ed448"
 )
 
 func TestNewProvider(t *testing.T) {
@@ -84,17 +83,23 @@ func TestLoadProvider(t *testing.T) {
 		defaultCurve string
 	}
 	tests := []struct {
-		name string
-		args args
-		want Provider
+		name    string
+		args    args
+		want    Provider
+		wantErr bool
 	}{
-		{"Ed25519", args{Ed25519KeySet{}, Ed448KeySet{}, Ed25519}, Provider{Ed25519KeySet{}, Ed448KeySet{}, ed448.NewCurve(), Ed25519}},
-		{"Ed448", args{Ed25519KeySet{}, Ed448KeySet{}, Ed448}, Provider{Ed25519KeySet{}, Ed448KeySet{}, ed448.NewCurve(), Ed448}},
-		{"Unknown", args{Ed25519KeySet{}, Ed448KeySet{}, "unknown"}, Provider{}},
+		{"Ed25519", args{Ed25519KeySet{}, Ed448KeySet{}, Ed25519}, Provider{Ed25519KeySet{}, Ed448KeySet{}, ed448.NewCurve(), Ed25519}, false},
+		{"Ed448", args{Ed25519KeySet{}, Ed448KeySet{}, Ed448}, Provider{Ed25519KeySet{}, Ed448KeySet{}, ed448.NewCurve(), Ed448}, false},
+		{"Unknown", args{Ed25519KeySet{}, Ed448KeySet{}, "unknown"}, Provider{}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := LoadProvider(tt.args.k2, tt.args.k4, tt.args.defaultCurve); !reflect.DeepEqual(got, tt.want) {
+			got, err := LoadProvider(tt.args.k2, tt.args.k4, tt.args.defaultCurve)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LoadProvider() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("LoadProvider() = %v, want %v", got, tt.want)
 			}
 		})
