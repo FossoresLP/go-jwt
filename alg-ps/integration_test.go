@@ -100,7 +100,7 @@ o2kQ+X5xK9cipRgEKwIDAQAB
 		t.Errorf("Could not decode key: %s", err.Error())
 		t.FailNow()
 	}
-	p := LoadProvider(ks, PS384)
+	p, _ := LoadProvider(ks, PS384)
 	jwt.SetAlgorithm(PS384, p)
 	jwt.DefaultAlgorithm(PS384)
 	dec, err := jwt.Decode(token)
