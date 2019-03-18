@@ -128,9 +128,13 @@ func TestProvider_Verify(t *testing.T) {
 	if p.Verify(nil, nil, jwt.Header{}) == nil {
 		t.Error("Verify() did not return an error when canVerify is false")
 	}
-	p = Provider{set: KeySet{canVerify: true}, ilen: 16}
+	p = Provider{hash: crypto.SHA256, set: KeySet{public: &ecdsa.PublicKey{Curve: elliptic.P256(), X: x, Y: y}, canVerify: true}, ilen: 32}
 	b := [12]byte{0xFF}
 	if p.Verify(nil, b[:], jwt.Header{}) == nil {
 		t.Error("Verify() did not return an error when signature has wrong length")
+	}
+	b2 := [64]byte{0xFF}
+	if p.Verify([]byte("test"), b2[:], jwt.Header{}) == nil {
+		t.Error("Verify() did not return an error when encountering a wrong signature")
 	}
 }

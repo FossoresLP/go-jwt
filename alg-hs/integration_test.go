@@ -2,7 +2,9 @@ package hs
 
 import (
 	"bytes"
+	"crypto/hmac"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"testing"
 
@@ -174,4 +176,11 @@ func TestInvalidRandomGenerator(t *testing.T) {
 		t.Error("NewProviderWithKeyURL() should fail with empty random generator for secret key")
 	}
 	rand.Reader = random
+}
+
+func TestInvalidSignature(t *testing.T) {
+	p := Provider{hmac: hmac.New(sha256.New, []byte("key"))}
+	if p.Verify([]byte("test"), []byte("signature"), jwt.Header{}) == nil {
+		t.Error("Provider.Verify() should fail with invalid signature")
+	}
 }

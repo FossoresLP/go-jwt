@@ -111,8 +111,12 @@ func TestProvider_Sign(t *testing.T) {
 }
 
 func TestProvider_Verify(t *testing.T) {
-	p := Provider{set: KeySet{canVerify: false}}
+	p := Provider{hash: crypto.SHA256, set: KeySet{public: &rsa.PublicKey{N: big.NewInt(3603479687), E: 65537}, canVerify: false}}
 	if p.Verify(nil, nil, jwt.Header{}) == nil {
+		t.Error("Verify() did not return an error when canVerify is false")
+	}
+	p.set.canVerify = true
+	if p.Verify([]byte("test"), []byte("signature"), jwt.Header{}) == nil {
 		t.Error("Verify() did not return an error when canVerify is false")
 	}
 }

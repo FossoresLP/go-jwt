@@ -8,6 +8,7 @@ import (
 
 	"github.com/fossoreslp/go-jwt"
 	"github.com/otrv4/ed448"
+	"golang.org/x/crypto/ed25519"
 )
 
 func TestNewProvider(t *testing.T) {
@@ -158,13 +159,21 @@ func TestProvider_Sign(t *testing.T) {
 }
 
 func TestProvider_Verify(t *testing.T) {
-	p25519 := Provider{Ed25519KeySet{canVerify: false}, Ed448KeySet{}, ed448.NewCurve(), ""}
+	p25519 := Provider{Ed25519KeySet{public: ed25519.PublicKey{0x9a, 0xe1, 0x6f, 0x74, 0x0d, 0xc1, 0x49, 0x0a, 0xa7, 0x36, 0x9f, 0xb5, 0xce, 0x09, 0xe6, 0x07, 0xa3, 0xd9, 0x78, 0xd4, 0x8e, 0xa2, 0x87, 0x19, 0x1e, 0x92, 0x95, 0x5b, 0xa2, 0x9d, 0x74, 0xb2}, canVerify: false}, Ed448KeySet{}, ed448.NewCurve(), Ed25519}
 	if p25519.Verify(nil, nil, jwt.Header{Crv: Ed25519}) == nil {
 		t.Error("Provider.Verify() should fail because canVerify is false for specified curve")
 	}
-	p448 := Provider{Ed25519KeySet{}, Ed448KeySet{canVerify: false}, ed448.NewCurve(), ""}
+	p25519.ed25519keyset.canVerify = true
+	if p25519.Verify([]byte("test"), []byte("signature"), jwt.Header{Crv: Ed25519}) == nil {
+		t.Error("Provider.Verify() should fail for invalid signature")
+	}
+	p448 := Provider{Ed25519KeySet{}, Ed448KeySet{public: [56]byte{0x65, 0x0d, 0x46, 0xb1, 0x0c, 0x4f, 0xd2, 0x2e, 0xd9, 0x4c, 0x97, 0x34, 0x49, 0x88, 0x16, 0xd1, 0xc8, 0x6a, 0x34, 0xa7, 0xae, 0x4d, 0xcb, 0x81, 0x4c, 0xd9, 0x45, 0xfb, 0x31, 0x4d, 0xe2, 0xaa, 0x04, 0xde, 0x17, 0xee, 0xf5, 0xae, 0x27, 0x29, 0xa0, 0x33, 0x25, 0x98, 0x27, 0x3f, 0xce, 0x9d, 0xe1, 0x4c, 0xf3, 0x24, 0x6b, 0x89, 0x4b, 0x60}, canVerify: false}, ed448.NewCurve(), Ed448}
 	if p448.Verify(nil, nil, jwt.Header{Crv: Ed448}) == nil {
 		t.Error("Provider.Verify() should fail because canVerify is false for specified curve")
+	}
+	p448.ed448keyset.canVerify = true
+	if p448.Verify([]byte("test"), []byte("signature"), jwt.Header{Crv: Ed448}) == nil {
+		t.Error("Provider.Verify() should fail for invalid signature")
 	}
 	punknown := Provider{Ed25519KeySet{}, Ed448KeySet{}, ed448.NewCurve(), ""}
 	if punknown.Verify(nil, nil, jwt.Header{Crv: "unknown"}) == nil {
