@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -9,6 +10,9 @@ import (
 type TestAlgorithm string
 
 func (alg TestAlgorithm) Sign(data []byte) ([]byte, error) {
+	if string(alg) == "error" {
+		return nil, errors.New("Here's the error you requested")
+	}
 	return append([]byte(alg), data...), nil
 }
 
