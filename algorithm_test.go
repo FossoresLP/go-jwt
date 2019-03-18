@@ -8,8 +8,8 @@ import (
 
 type TestAlgorithm string
 
-func (alg TestAlgorithm) Sign(data []byte) []byte {
-	return append([]byte(alg), data...)
+func (alg TestAlgorithm) Sign(data []byte) ([]byte, error) {
+	return append([]byte(alg), data...), nil
 }
 
 func (alg TestAlgorithm) Verify(data, hash []byte, h Header) bool {

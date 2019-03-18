@@ -108,15 +108,15 @@ func (p Provider) Header(h *jwt.Header) {
 }
 
 // Sign signs the content of a JWT
-func (p Provider) Sign(c []byte) []byte {
+func (p Provider) Sign(c []byte) ([]byte, error) {
 	if !p.set.canSign {
-		return nil
+		return nil, errors.New("keyset does not allow signing")
 	}
 	hash := p.hash.New()
 	hash.Write(c)
 	r, s, err := ecdsa.Sign(rand.Reader, p.set.private, hash.Sum(nil))
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	rb := r.Bytes()
@@ -139,7 +139,7 @@ func (p Provider) Sign(c []byte) []byte {
 		sb = append(p, sb...)
 	}
 
-	return append(rb, sb...)
+	return append(rb, sb...), nil
 }
 
 // Verify verifies if the content matches it's signature.

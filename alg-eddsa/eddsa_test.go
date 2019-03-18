@@ -135,15 +135,19 @@ func TestProvider_Header(t *testing.T) {
 
 func TestProvider_Sign(t *testing.T) {
 	p25519 := Provider{Ed25519KeySet{canSign: false}, Ed448KeySet{}, ed448.NewCurve(), Ed25519}
-	if p25519.Sign(nil) != nil {
+	if _, err := p25519.Sign(nil); err == nil {
 		t.Error("Provider.Sign() should fail because canSign is false for default curve")
 	}
 	p448 := Provider{Ed25519KeySet{}, Ed448KeySet{canSign: false}, ed448.NewCurve(), Ed448}
-	if p448.Sign(nil) != nil {
+	if _, err := p448.Sign(nil); err == nil {
 		t.Error("Provider.Sign() should fail because canSign is false for default curve")
 	}
+	p448invalid := Provider{Ed25519KeySet{}, Ed448KeySet{private: [144]byte{33, 147, 45, 233, 236, 0, 92, 221, 111, 132, 50, 172, 83, 220, 197, 251, 46, 83, 98, 113, 173, 250, 128, 15, 127, 85, 149, 81, 253, 149, 84, 233, 76, 193, 173, 2, 193, 133, 5, 110, 215, 167, 6, 246, 145, 232, 50, 246, 120, 203, 191, 73, 226, 187, 134, 244, 139, 144, 55, 7, 217, 55, 48, 50, 59, 69, 52, 245, 17, 88, 150, 144, 192, 86, 215, 194, 107, 27, 105, 18, 204, 119, 213, 231, 70, 116, 232, 126, 57, 115, 221, 8, 152, 154, 20, 204, 37, 255, 227, 237, 136, 58, 151, 207, 108, 214, 113, 87, 22, 144, 227, 121, 79, 213, 114, 45, 207, 192, 160, 60, 193, 149, 53, 220, 34, 103, 37, 25, 90, 18, 60, 190, 209, 191, 147, 242, 127, 173, 86, 221, 233, 192, 44, 167}, canSign: true}, ed448.NewCurve(), Ed448}
+	if _, err := p448invalid.Sign(nil); err == nil {
+		t.Error("Provider.Sign() should fail because Ed448 private key is invalid")
+	}
 	punknown := Provider{Ed25519KeySet{}, Ed448KeySet{}, ed448.NewCurve(), "unknown"}
-	if punknown.Sign(nil) != nil {
+	if _, err := punknown.Sign(nil); err == nil {
 		t.Error("Provider.Sign() should fail because default curve is unknown")
 	}
 }

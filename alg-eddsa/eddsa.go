@@ -83,24 +83,24 @@ func (p Provider) Header(h *jwt.Header) {
 }
 
 // Sign signs the content of a JWT using the default curve
-func (p Provider) Sign(c []byte) []byte {
+func (p Provider) Sign(c []byte) ([]byte, error) {
 	switch p.defaultCurve {
 	case Ed25519:
 		if !p.ed25519keyset.canSign {
-			return nil
+			return nil, errors.New("keyset does not allow signing")
 		}
-		return ed25519.Sign(p.ed25519keyset.private, c)
+		return ed25519.Sign(p.ed25519keyset.private, c), nil
 	case Ed448:
 		if !p.ed448keyset.canSign {
-			return nil
+			return nil, errors.New("keyset does not allow signing")
 		}
 		sig, ok := p.ed448curve.Sign(p.ed448keyset.private, c)
 		if !ok {
-			return nil
+			return nil, errors.New("signing failed")
 		}
-		return sig[:]
+		return sig[:], nil
 	}
-	return nil
+	return nil, errors.New("unknown curve")
 }
 
 // Verify verifies if the content matches it's signature. The curve to use is set by the header.

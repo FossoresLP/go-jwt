@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"errors"
+	"hash"
 
 	"github.com/fossoreslp/go-jwt"
 	"github.com/fossoreslp/go-jwt/publickey"
@@ -23,11 +24,11 @@ const (
 	HS512 = "HS512"
 )
 
-// Provider is an interface all providers in this package support
-type Provider interface {
-	Header(h *jwt.Header)
-	Sign(c []byte) []byte
-	Verify(data, sig []byte, h jwt.Header) bool
+// Provider provides HMAC-SHA2 JWS signing and verification
+type Provider struct {
+	alg  string
+	hmac hash.Hash
+	set  KeySet
 }
 
 // NewProvider creates a new Provider generating the necessary keypairs
@@ -39,132 +40,72 @@ func NewProvider(t string) (Provider, []publickey.PublicKey, error) {
 func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, error) {
 	kid, err := uuid.NewString()
 	if err != nil {
-		return nil, nil, err
+		return Provider{}, nil, err
 	}
 	var c int
+	var alg string
+	var h func() hash.Hash
 	switch t {
 	case HS256:
 		c = 32
+		alg = HS256
+		h = sha256.New
 	case HS384:
 		c = 48
+		alg = HS384
+		h = sha512.New384
 	case HS512:
 		c = 64
+		alg = HS512
+		h = sha512.New
 	default:
-		return nil, nil, errors.New("type string is invalid")
+		return Provider{}, nil, errors.New("type string is invalid")
 	}
-	b := make([]byte, c)
-	_, err = rand.Read(b)
+	k := make([]byte, c)
+	_, err = rand.Read(k)
 	if err != nil {
-		return nil, nil, err
+		return Provider{}, nil, err
 	}
-	var p Provider
-	switch t {
-	case HS256:
-		p = HS256Provider{b, kid, keyURL}
-	case HS384:
-		p = HS384Provider{b, kid, keyURL}
-	case HS512:
-		p = HS512Provider{b, kid, keyURL}
-	}
-	return p, []publickey.PublicKey{publickey.New(b, kid)}, nil
+	return Provider{alg, hmac.New(h, k), KeySet{k, kid, keyURL}}, []publickey.PublicKey{publickey.New(k, kid)}, nil
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
 func LoadProvider(k KeySet, t string) Provider {
 	switch t {
 	case HS256:
-		return HS256Provider(k)
+		return Provider{HS256, hmac.New(sha256.New, k.key), k}
 	case HS384:
-		return HS384Provider(k)
+		return Provider{HS384, hmac.New(sha512.New384, k.key), k}
 	case HS512:
-		return HS512Provider(k)
+		return Provider{HS512, hmac.New(sha512.New, k.key), k}
 	}
-	return nil
+	return Provider{}
 }
 
-// HS256Provider provides HMAC-SHA256 JWS signing and verification
-type HS256Provider KeySet
+func (p Provider) getMAC(in []byte) []byte {
+	p.hmac.Reset()
+	p.hmac.Write(in)
+	return p.hmac.Sum(nil)
+}
 
 // Header sets the necessary JWT header fields
-func (p HS256Provider) Header(h *jwt.Header) {
-	h.Alg = HS256
-	if p.kid != "" {
-		h.Kid = p.kid
+func (p Provider) Header(h *jwt.Header) {
+	h.Alg = p.alg
+	if p.set.kid != "" {
+		h.Kid = p.set.kid
 	}
-	if p.jku != "" {
-		h.Jku = p.jku
+	if p.set.jku != "" {
+		h.Jku = p.set.jku
 	}
 }
 
 // Sign signs the content of a JWT
-func (p HS256Provider) Sign(c []byte) []byte {
-	mac := hmac.New(sha256.New, p.key)
-	mac.Write(c)
-	return mac.Sum(nil)
+func (p Provider) Sign(c []byte) ([]byte, error) {
+	return p.getMAC(c), nil
 }
 
 // Verify verifies if the content matches it's signature.
-func (p HS256Provider) Verify(data, sig []byte, h jwt.Header) bool {
-	mac := hmac.New(sha256.New, p.key)
-	mac.Write(data)
-	expectedMAC := mac.Sum(nil)
-	return hmac.Equal(sig, expectedMAC)
-}
-
-// HS384Provider provides HMAC-SHA384 JWS signing and verification
-type HS384Provider KeySet
-
-// Header sets the necessary JWT header fields
-func (p HS384Provider) Header(h *jwt.Header) {
-	h.Alg = HS384
-	if p.kid != "" {
-		h.Kid = p.kid
-	}
-	if p.jku != "" {
-		h.Jku = p.jku
-	}
-}
-
-// Sign signs the content of a JWT
-func (p HS384Provider) Sign(c []byte) []byte {
-	mac := hmac.New(sha512.New384, p.key)
-	mac.Write(c)
-	return mac.Sum(nil)
-}
-
-// Verify verifies if the content matches it's signature.
-func (p HS384Provider) Verify(data, sig []byte, h jwt.Header) bool {
-	mac := hmac.New(sha512.New384, p.key)
-	mac.Write(data)
-	expectedMAC := mac.Sum(nil)
-	return hmac.Equal(sig, expectedMAC)
-}
-
-// HS512Provider provides HMAC-SHA512 JWS signing and verification
-type HS512Provider KeySet
-
-// Header sets the necessary JWT header fields
-func (p HS512Provider) Header(h *jwt.Header) {
-	h.Alg = HS512
-	if p.kid != "" {
-		h.Kid = p.kid
-	}
-	if p.jku != "" {
-		h.Jku = p.jku
-	}
-}
-
-// Sign signs the content of a JWT
-func (p HS512Provider) Sign(c []byte) []byte {
-	mac := hmac.New(sha512.New, p.key)
-	mac.Write(c)
-	return mac.Sum(nil)
-}
-
-// Verify verifies if the content matches it's signature.
-func (p HS512Provider) Verify(data, sig []byte, h jwt.Header) bool {
-	mac := hmac.New(sha512.New, p.key)
-	mac.Write(data)
-	expectedMAC := mac.Sum(nil)
+func (p Provider) Verify(data, sig []byte, h jwt.Header) bool {
+	expectedMAC := p.getMAC(data)
 	return hmac.Equal(sig, expectedMAC)
 }

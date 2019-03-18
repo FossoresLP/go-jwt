@@ -85,8 +85,8 @@ func TestProvider_Header(t *testing.T) {
 func TestProvider_Sign(t *testing.T) {
 	// CanSign == false
 	p := Provider{set: KeySet{canSign: false}}
-	if p.Sign(nil) != nil {
-		t.Error("Sign() did not return nil when canSign is false")
+	if _, err := p.Sign(nil); err == nil {
+		t.Error("Sign() did not return an error when canSign is false")
 	}
 
 	// Save default rand.Reader
@@ -96,21 +96,23 @@ func TestProvider_Sign(t *testing.T) {
 	priv := &ecdsa.PrivateKey{PublicKey: ecdsa.PublicKey{Curve: elliptic.P256(), X: x, Y: y}, D: d}
 	rand.Reader = bytes.NewReader(nil)
 	p = Provider{hash: crypto.SHA256, set: KeySet{private: priv, canSign: true}, ilen: 16}
-	if p.Sign(nil) != nil {
-		t.Error("Sign() did not return nil when no random data was available to generate signature")
+	if _, err := p.Sign(nil); err == nil {
+		t.Error("Sign() did not return an error when no random data was available to generate signature")
 	}
 
 	// Restore default rand.Reader
 	rand.Reader = random
 
 	// Test truncation
-	if l := len(p.Sign(nil)); l != 32 {
+	b, _ := p.Sign(nil)
+	if l := len(b); l != 32 {
 		t.Errorf("Sign() should return byte slice of length 32 but was %d", l)
 	}
 
 	// Test length extension
 	p.ilen = 128
-	if l := len(p.Sign(nil)); l != 256 {
+	b, _ = p.Sign(nil)
+	if l := len(b); l != 256 {
 		t.Errorf("Sign() should return byte slice of length 256 but was %d", l)
 	}
 }

@@ -93,17 +93,17 @@ func (p Provider) Header(h *jwt.Header) {
 }
 
 // Sign signs the content of a JWT
-func (p Provider) Sign(c []byte) []byte {
+func (p Provider) Sign(c []byte) ([]byte, error) {
 	if !p.set.canSign {
-		return nil
+		return nil, errors.New("keyset does not allow signing")
 	}
 	hash := p.hash.New()
 	hash.Write(c)
 	sum, err := rsa.SignPKCS1v15(rand.Reader, p.set.private, p.hash, hash.Sum(nil))
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return sum
+	return sum, nil
 }
 
 // Verify verifies if the content matches it's signature.

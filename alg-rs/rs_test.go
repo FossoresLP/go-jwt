@@ -85,8 +85,8 @@ func TestProvider_Header(t *testing.T) {
 func TestProvider_Sign(t *testing.T) {
 	// CanSign == false
 	p := Provider{set: KeySet{canSign: false}}
-	if p.Sign(nil) != nil {
-		t.Error("Sign() did not return nil when canSign is false")
+	if _, err := p.Sign(nil); err == nil {
+		t.Error("Sign() did not return an error when canSign is false")
 	}
 
 	// Save default rand.Reader
@@ -96,8 +96,8 @@ func TestProvider_Sign(t *testing.T) {
 	priv := &rsa.PrivateKey{PublicKey: rsa.PublicKey{N: big.NewInt(3603479687), E: 65537}, D: big.NewInt(674849825), Primes: []*big.Int{big.NewInt(64063), big.NewInt(56249)}, Precomputed: rsa.PrecomputedValues{Dp: big.NewInt(20717), Dq: big.NewInt(42569), Qinv: big.NewInt(7600), CRTValues: []rsa.CRTValue{}}}
 	rand.Reader = bytes.NewReader(nil)
 	p = Provider{hash: crypto.SHA256, set: KeySet{private: priv, canSign: true}}
-	if p.Sign(nil) != nil {
-		t.Error("Sign() did not return nil when no random data was available to generate signature")
+	if _, err := p.Sign(nil); err == nil {
+		t.Error("Sign() did not return an error when no random data was available to generate signature")
 	}
 
 	// Restore default rand.Reader
