@@ -47,16 +47,17 @@ jobs:
       - run:
           name: Upload coverage
           command: ./uploader.run
-  go-vet:
+  golangci-lint:
     docker:
       - image: golang:alpine
     working_directory: ~/jwt
     steps:
       - checkout
-      - run: apk add git
+      - run: apk add git build-base
+      - run: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
       - run:
-          name: go vet
-          command: go vet
+          name: golangci-lint
+          command: golangci-lint run
 
 workflows:
   version: 2
@@ -64,4 +65,4 @@ workflows:
     jobs:
       - go-test
       - coverage
-      - go-vet
+      - golangci-lint

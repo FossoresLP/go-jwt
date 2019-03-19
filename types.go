@@ -9,7 +9,7 @@ type Header struct {
 	Crv string `json:"crv,omitempty"`
 }
 
-// JWT contains the header and content of a JSON web token as well as the decoded hash
+// JWT contains the decoded header and encoded content of a JSON web token
 type JWT struct {
 	Header          Header
 	Content         []byte
