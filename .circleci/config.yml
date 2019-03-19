@@ -13,16 +13,16 @@ jobs:
           name: Base package unit tests
           command: go test -v 2>&1 | go-junit-report > test-results/Base/report.xml
       - run:
-          name: HS provider unit tests
+          name: HMAC-SHA2 provider unit tests
           command: go test -v ./alg-hs 2>&1 | go-junit-report > test-results/HMAC-SHA2/report.xml
       - run:
-          name: RS provider unit tests
+          name: RSA PKCS#1 v1.5 provider unit tests
           command: go test -v ./alg-rs 2>&1 | go-junit-report > test-results/RSA-PKCS1_5/report.xml
       - run:
-          name: PS provider unit tests
+          name: RSA PSS provider unit tests
           command: go test -v ./alg-ps 2>&1 | go-junit-report > test-results/RSA-PSS/report.xml
       - run:
-          name: ES provider unit tests
+          name: ECDSA provider unit tests
           command: go test -v ./alg-es 2>&1 | go-junit-report > test-results/ECDSA/report.xml
       - run:
           name: EdDSA provider unit tests
@@ -52,9 +52,16 @@ jobs:
       - image: golang:alpine
     working_directory: ~/jwt
     steps:
+      - run: apk add git build-base curl jq
+      - restore_cache:
+          - keys:
+              - linter-go_v{{go version | grep -o "[0-9]*\.[0-9]*\.*[0-9]*"}}-linter_{{curl -s https://api.github.com/repos/golangci/golangci-lint/releases/latest | jq -r .tag_name}}
       - checkout
-      - run: apk add git build-base
       - run: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+      - save_cache:
+          key: linter-go_v{{go version | grep -o "[0-9]*\.[0-9]*\.*[0-9]*"}}-linter_{{curl -s https://api.github.com/repos/golangci/golangci-lint/releases/latest | jq -r .tag_name}}
+          paths:
+            - /go
       - run:
           name: golangci-lint
           command: golangci-lint run
