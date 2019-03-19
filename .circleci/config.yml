@@ -8,28 +8,28 @@ jobs:
       - checkout
       - run: apk add git build-base
       - run: go get -u github.com/jstemmer/go-junit-report
-      - run: mkdir test-results
+      - run: mkdir test-results test-results/Base test-results/HMAC-SHA2 test-results/RSA-PKCS1_5 test-results/RSA-PSS test-results/ECDSA test-results/EdDSA test-results/PublicKey
       - run:
           name: Base package unit tests
-          command: go test -v 2>&1 | go-junit-report > test-results/report.xml
+          command: go test -v 2>&1 | go-junit-report > test-results/Base/report.xml
       - run:
           name: HS provider unit tests
-          command: go test -v ./alg-hs 2>&1 | go-junit-report > test-results/report-hs.xml
+          command: go test -v ./alg-hs 2>&1 | go-junit-report > test-results/HMAC-SHA2/report.xml
       - run:
           name: RS provider unit tests
-          command: go test -v ./alg-rs 2>&1 | go-junit-report > test-results/report-rs.xml
+          command: go test -v ./alg-rs 2>&1 | go-junit-report > test-results/RSA-PKCS1_5/report.xml
       - run:
           name: PS provider unit tests
-          command: go test -v ./alg-ps 2>&1 | go-junit-report > test-results/report-ps.xml
+          command: go test -v ./alg-ps 2>&1 | go-junit-report > test-results/RSA-PSS/report.xml
       - run:
           name: ES provider unit tests
-          command: go test -v ./alg-es 2>&1 | go-junit-report > test-results/report-es.xml
+          command: go test -v ./alg-es 2>&1 | go-junit-report > test-results/ECDSA/report.xml
       - run:
           name: EdDSA provider unit tests
-          command: go test -v ./alg-eddsa 2>&1 | go-junit-report > test-results/report-eddsa.xml
+          command: go test -v ./alg-eddsa 2>&1 | go-junit-report > test-results/EdDSA/report.xml
       - run:
           name: Public key unit tests
-          command: go test -v ./publickey 2>&1 | go-junit-report > test-results/report-publickey.xml
+          command: go test -v ./publickey 2>&1 | go-junit-report > test-results/PublicKey/report.xml
       - store_test_results:
           path: test-results
   coverage:
