@@ -54,8 +54,7 @@ jobs:
     steps:
       - run: apk add git build-base curl jq
       - restore_cache:
-          - keys:
-              - linter-go_v{{go version | grep -o "[0-9]*\.[0-9]*\.*[0-9]*"}}-linter_{{curl -s https://api.github.com/repos/golangci/golangci-lint/releases/latest | jq -r .tag_name}}
+          key: linter-go_v{{go version | grep -o "[0-9]*\.[0-9]*\.*[0-9]*"}}-linter_{{curl -s https://api.github.com/repos/golangci/golangci-lint/releases/latest | jq -r .tag_name}}
       - checkout
       - run: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
       - save_cache:
