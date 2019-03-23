@@ -41,7 +41,7 @@ func TestNewSettings(t *testing.T) {
 	}
 }
 
-func TestNewSettingsWithKeyID(t *testing.T) {
+func TestNewSettingsWithKeyURL(t *testing.T) {
 	type args struct {
 		key    []byte
 		keyid  string
@@ -59,7 +59,7 @@ func TestNewSettingsWithKeyID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewSettingsWithKeyID(tt.args.key, tt.args.keyid, tt.args.keyurl)
+			got, err := NewSettingsWithKeyURL(tt.args.key, tt.args.keyid, tt.args.keyurl)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewSettingsWithKeyID() error = %v, wantErr %v", err, tt.wantErr)
 				return

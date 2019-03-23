@@ -17,11 +17,11 @@ type Settings struct {
 
 // NewSettings creates new signature settings for the parameters
 func NewSettings(key []byte, keyid string) (Settings, error) {
-	return NewSettingsWithKeyID(key, keyid, "")
+	return NewSettingsWithKeyURL(key, keyid, "")
 }
 
-// NewSettingsWithKeyID creates new signature settings for the parameters
-func NewSettingsWithKeyID(key []byte, keyid, keyurl string) (Settings, error) {
+// NewSettingsWithKeyURL creates new signature settings for the parameters
+func NewSettingsWithKeyURL(key []byte, keyid, keyurl string) (Settings, error) {
 	if len(key) == ed25519.PrivateKeySize {
 		return Settings{Ed25519, ed25519.PrivateKey(key), [144]byte{0x00}, keyid, keyurl}, nil
 	}
