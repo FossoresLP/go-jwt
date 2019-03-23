@@ -7,7 +7,7 @@ import (
 )
 
 func TestEd25519(t *testing.T) {
-	p, _, err := NewProvider("Ed25519")
+	p, err := NewProvider(Ed25519)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
@@ -29,7 +29,7 @@ func TestEd25519(t *testing.T) {
 }
 
 func TestEd448(t *testing.T) {
-	p, _, err := NewProvider("Ed448")
+	p, err := NewProvider(Ed448)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
