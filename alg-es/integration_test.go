@@ -8,15 +8,15 @@ import (
 )
 
 func TestES256(t *testing.T) {
-	p, k, err := NewProvider(ES256)
+	p, err := NewProvider(ES256)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := k[0].GetPublicKey()
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
+	rk := p.CurrentKey()
+	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk.GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(ES256, p)
-	jwt.DefaultAlgorithm(ES256) // nolint:errcheck
+	jwt.SetAlgorithm(algToString(ES256), p)
+	jwt.DefaultAlgorithm(algToString(ES256)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -33,15 +33,15 @@ func TestES256(t *testing.T) {
 }
 
 func TestES384(t *testing.T) {
-	p, k, err := NewProvider(ES384)
+	p, err := NewProvider(ES384)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := k[0].GetPublicKey()
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
+	rk := p.CurrentKey()
+	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk.GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(ES384, p)
-	jwt.DefaultAlgorithm(ES384) // nolint:errcheck
+	jwt.SetAlgorithm(algToString(ES384), p)
+	jwt.DefaultAlgorithm(algToString(ES384)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -58,15 +58,15 @@ func TestES384(t *testing.T) {
 }
 
 func TestES512(t *testing.T) {
-	p, k, err := NewProvider(ES512)
+	p, err := NewProvider(ES512)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := k[0].GetPublicKey()
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
+	rk := p.CurrentKey()
+	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk.GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(ES512, p)
-	jwt.DefaultAlgorithm(ES512) // nolint:errcheck
+	jwt.SetAlgorithm(algToString(ES512), p)
+	jwt.DefaultAlgorithm(algToString(ES512)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
