@@ -8,67 +8,63 @@ import (
 	"github.com/fossoreslp/go-jwt/publickey"
 )
 
-// KeySet stores the key for an algorithm
-type KeySet struct {
-	private   *rsa.PrivateKey
-	public    *rsa.PublicKey
-	kid       string
-	jku       string
-	canSign   bool
-	canVerify bool
+// Settings stores the key for an algorithm
+type Settings struct {
+	private *rsa.PrivateKey
+	kid     string
+	jku     string
 }
 
-// SetKeys sets the key
-func (ks *KeySet) SetKeys(priv, pub []byte) error {
-	if priv != nil {
-		key, err := x509.ParsePKCS1PrivateKey(priv)
+// NewSettings creates new signature settings for the parameters
+func NewSettings(key []byte, keyID string) (Settings, error) {
+	return NewSettingsWithKeyURL(key, keyID, "")
+}
+
+// NewSettingsWithKeyURL creates new signature settings for the parameters
+func NewSettingsWithKeyURL(key []byte, keyID, keyURL string) (Settings, error) {
+	rsaKey, err := x509.ParsePKCS1PrivateKey(key)
+	if err != nil {
+		k, err := x509.ParsePKCS8PrivateKey(key)
 		if err != nil {
-			k, err := x509.ParsePKCS8PrivateKey(priv)
-			if err != nil {
-				return errors.New("could not decode private key as either PKCS1 or PKCS8")
-			}
-			rsaKey, ok := k.(*rsa.PrivateKey)
-			if !ok {
-				return errors.New("PKCS8 does not contain a RSA private key")
-			}
-			key = rsaKey
+			return Settings{}, errors.New("could not decode private key as either PKCS1 or PKCS8")
 		}
-		ks.private = key
-		ks.canSign = true
-	}
-	if pub != nil {
-		key, err := x509.ParsePKIXPublicKey(pub)
-		if err != nil {
-			return errors.New("could not decode public key")
-		}
-		rsaKey, ok := key.(*rsa.PublicKey)
+		castKey, ok := k.(*rsa.PrivateKey)
 		if !ok {
-			return errors.New("public key is not a RSA public key")
+			return Settings{}, errors.New("PKCS8 does not contain a RSA private key")
 		}
-		ks.public = rsaKey
-		ks.canVerify = true
+		rsaKey = castKey
 	}
+	return Settings{rsaKey, keyID, keyURL}, nil
+}
+
+// AddPublicKey adds a public key for verification
+func (p *Provider) AddPublicKey(key publickey.PublicKey) error {
+	id := key.GetKeyID()
+	if _, ok := p.keys[id]; ok {
+		return errors.New("key ID already exists")
+	}
+	pub, err := x509.ParsePKIXPublicKey(key.GetPublicKey())
+	if err != nil {
+		return errors.New("could not decode public key")
+	}
+	rsaKey, ok := pub.(*rsa.PublicKey)
+	if !ok {
+		return errors.New("public key is not a RSA public key")
+	}
+	p.keys[id] = rsaKey
 	return nil
 }
 
-// SetKeyID sets the key id of the key set
-func (ks *KeySet) SetKeyID(kid string) {
-	ks.kid = kid
+// Remove public key removes a public key by it's key ID from the verification set
+func (p *Provider) RemovePublicKey(keyid string) {
+	if keyid == p.settings.kid {
+		return
+	}
+	delete(p.keys, keyid)
 }
 
-// SetKeyURL sets the key url of the key set
-func (ks *KeySet) SetKeyURL(jku string) {
-	ks.jku = jku
-}
-
-// GetPublicKey returns the public key of the keyset
-func (ks KeySet) GetPublicKey() publickey.PublicKey {
-	if ks.public == nil {
-		return publickey.PublicKey{}
-	}
-	b, err := x509.MarshalPKIXPublicKey(ks.public)
-	if err != nil {
-		return publickey.PublicKey{}
-	}
-	return publickey.New(b, ks.kid)
+// CurrentKey returns the public key belonging to the private key used for signing.
+func (p Provider) CurrentKey() publickey.PublicKey {
+	b, _ := x509.MarshalPKIXPublicKey(&p.settings.private.PublicKey) // Marshaling an RSA public key should never fail
+	return publickey.New(b, p.settings.kid)
 }
