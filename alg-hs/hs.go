@@ -9,41 +9,54 @@ import (
 	"hash"
 
 	"github.com/fossoreslp/go-jwt"
-	"github.com/fossoreslp/go-jwt/publickey"
 	"github.com/fossoreslp/go-uuid-v4"
 )
 
 const (
 	// HS256 is HMAC-SHA256
-	HS256 = "HS256"
+	HS256 = 1
 
 	// HS384 is HMAC-SHA384
-	HS384 = "HS384"
+	HS384 = 2
 
 	// HS512 is HMAC-SHA512
-	HS512 = "HS512"
+	HS512 = 3
 )
+
+func algToString(alg int) string {
+	switch alg {
+	case HS256:
+		return "HS256"
+	case HS384:
+		return "HS384"
+	case HS512:
+		return "HS512"
+	default:
+		return ""
+	}
+}
 
 // Provider provides HMAC-SHA2 JWS signing and verification
 type Provider struct {
-	alg  string
-	hmac hash.Hash
-	set  KeySet
+	alg      int
+	hmac     hash.Hash
+	settings Settings
+	keys     map[string][]byte
 }
 
 // NewProvider creates a new Provider generating the necessary keypairs
-func NewProvider(t string) (Provider, []publickey.PublicKey, error) {
+func NewProvider(t int) (Provider, error) {
 	return NewProviderWithKeyURL(t, "")
 }
 
 // NewProviderWithKeyURL works just like NewProvider but also sets the key URL of the generated keys
-func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, error) {
+func NewProviderWithKeyURL(t int, keyURL string) (Provider, error) {
 	kid, err := uuid.NewString()
 	if err != nil {
-		return Provider{}, nil, err
+		return Provider{}, err
 	}
 	var c int
-	var alg string
+	var alg int
 	var h func() hash.Hash
 	switch t {
 	case HS256:
@@ -59,55 +72,78 @@ func NewProviderWithKeyURL(t, keyURL string) (Provider, []publickey.PublicKey, e
 		alg = HS512
 		h = sha512.New
 	default:
-		return Provider{}, nil, errors.New("type string is invalid")
+		return Provider{}, errors.New("invalid algorithm ID")
 	}
 	k := make([]byte, c)
 	_, err = rand.Read(k)
 	if err != nil {
-		return Provider{}, nil, err
+		return Provider{}, err
 	}
-	return Provider{alg, hmac.New(h, k), KeySet{k, kid, keyURL}}, []publickey.PublicKey{publickey.New(k, kid)}, nil
+	m := map[string][]byte{
+		kid: k,
+		"":  k,
+	}
+	return Provider{alg, hmac.New(h, k), Settings{k, kid, keyURL}, m}, nil
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(k KeySet, t string) (Provider, error) {
+func LoadProvider(s Settings, t int) (Provider, error) {
+	m := map[string][]byte{
+		s.kid: s.key,
+		"":    s.key,
+	}
 	switch t {
 	case HS256:
-		return Provider{HS256, hmac.New(sha256.New, k.key), k}, nil
+		return Provider{HS256, hmac.New(sha256.New, s.key), s, m}, nil
 	case HS384:
-		return Provider{HS384, hmac.New(sha512.New384, k.key), k}, nil
+		return Provider{HS384, hmac.New(sha512.New384, s.key), s, m}, nil
 	case HS512:
-		return Provider{HS512, hmac.New(sha512.New, k.key), k}, nil
+		return Provider{HS512, hmac.New(sha512.New, s.key), s, m}, nil
 	}
-	return Provider{}, errors.New("type string is invalid")
+	return Provider{}, errors.New("invalid algorithm ID")
 }
 
-func (p Provider) getMAC(in []byte) []byte {
-	p.hmac.Reset()
+func getMAC(mac hash.Hash, in []byte) []byte {
+	mac.Reset()
 	// HMAC only returns the error of SHA2 which itself does not return an error
-	p.hmac.Write(in) // nolint:errcheck
-	return p.hmac.Sum(nil)
+	mac.Write(in) // nolint:errcheck
+	return mac.Sum(nil)
 }
 
 // Header sets the necessary JWT header fields
 func (p Provider) Header(h *jwt.Header) {
-	h.Alg = p.alg
-	if p.set.kid != "" {
-		h.Kid = p.set.kid
+	h.Alg = algToString(p.alg)
+	if p.settings.kid != "" {
+		h.Kid = p.settings.kid
 	}
-	if p.set.jku != "" {
-		h.Jku = p.set.jku
+	if p.settings.jku != "" {
+		h.Jku = p.settings.jku
 	}
 }
 
 // Sign signs the content of a JWT
 func (p Provider) Sign(c []byte) ([]byte, error) {
-	return p.getMAC(c), nil
+	return getMAC(p.hmac, c), nil
 }
 
 // Verify verifies if the content matches it's signature.
 func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
-	expectedMAC := p.getMAC(data)
+	var hashFunc func() hash.Hash
+	switch h.Alg {
+	case "HS256":
+		hashFunc = sha256.New
+	case "HS384":
+		hashFunc = sha512.New384
+	case "HS512":
+		hashFunc = sha512.New
+	default:
+		return errors.New("invalid algorithm")
+	}
+	pub, ok := p.keys[h.Kid]
+	if !ok {
+		return errors.New("unknown key id")
+	}
+	expectedMAC := getMAC(hmac.New(hashFunc, pub), data)
 	if hmac.Equal(sig, expectedMAC) {
 		return nil
 	}
