@@ -8,6 +8,24 @@ import (
 
 func TestJWT_Valid(t *testing.T) {
 	tests := []struct {
+		name string
+		jwt  JWT
+		want bool
+	}{
+		{"Normal", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), nil}, true},
+		{"Error", JWT{Header{Typ: "JWT"}, []byte("{\"name\":\"test\",\"use\":\"testing\"}"), errors.New("test error")}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.jwt.Valid(); got != tt.want {
+				t.Errorf("JWT.Valid() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestJWT_ValidationError(t *testing.T) {
+	tests := []struct {
 		name    string
 		jwt     JWT
 		wantErr bool
@@ -17,12 +35,13 @@ func TestJWT_Valid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.jwt.Valid(); (err != nil) != tt.wantErr {
-				t.Errorf("JWT.Valid() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.jwt.ValidationError(); (err != nil) != tt.wantErr {
+				t.Errorf("JWT.ValidationError() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
+
 func TestHeader_getAlgorithm(t *testing.T) {
 	alg := TestAlgorithm("test")
 	SetAlgorithm("test", alg)
@@ -50,26 +69,6 @@ func TestHeader_getAlgorithm(t *testing.T) {
 	}
 }
 
-func Test_checkTimestamps(t *testing.T) {
-	tests := []struct {
-		name    string
-		c       []byte
-		wantErr bool
-	}{
-		{"Normal", []byte(`{"nbf": 1, "exp": 999999999999}`), false},
-		{"Invalid JSON", []byte(`{"test": {,}`), false}, // Invalid JSON does not cause an error
-		{"NotBefore", []byte(`{"nbf": 999999999999}`), true},
-		{"Expires", []byte(`{"exp": 1}`), true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := checkTimestamps(tt.c); (err != nil) != tt.wantErr {
-				t.Errorf("checkTimestamps() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestJWT_validate(t *testing.T) {
 	type args struct {
 		data      []byte
@@ -84,7 +83,6 @@ func TestJWT_validate(t *testing.T) {
 		{"Normal", JWT{Header{Typ: "JWT", Alg: "test"}, nil, nil}, args{[]byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ")}, false},
 		{"Unkown algorithm", JWT{Header{Typ: "JWT", Alg: "sample"}, nil, nil}, args{nil, nil}, true},
 		{"Invalid hash", JWT{Header{Typ: "JWT", Alg: "test"}, nil, nil}, args{[]byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ"), nil}, true},
-		{"Invalid Expires", JWT{Header{Typ: "JWT", Alg: "test"}, []byte(`{"exp":1}`), nil}, args{[]byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJleHAiOjF9"), []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJleHAiOjF9")}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -92,5 +90,36 @@ func TestJWT_validate(t *testing.T) {
 				t.Errorf("JWT.validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+type testValidationProvider byte
+
+func (_ testValidationProvider) Validate(c []byte) error {
+	if c[0] == 0xFF {
+		return errors.New("test error")
+	}
+	return nil
+}
+
+func TestValidation(t *testing.T) {
+	alg := TestAlgorithm("test")
+	SetAlgorithm("test", alg)
+	DefaultAlgorithm("test") // nolint:errcheck
+
+	token := JWT{Header{Typ: "JWT", Alg: "test"}, []byte{0x00}, nil}
+	failToken := JWT{Header{Typ: "JWT", Alg: "test"}, []byte{0xFF}, nil}
+	data := []byte("eyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ")
+	sig := []byte("testeyJ0eXAiOiJKV1QiLCJhbGciOiJ0ZXN0In0.eyJuYW1lIjoidGVzdCIsInVzZSI6InRlc3RpbmcifQ")
+
+	AddValidationProvider("test", testValidationProvider(0x0)) // nolint:errcheck
+
+	err := token.validate(data, sig)
+	if err != nil {
+		t.Errorf("did not expect error on JWT.validate() but got %s", err.Error())
+	}
+	err = failToken.validate(data, sig)
+	if err == nil {
+		t.Error("did expect error on JWT.validate() but got none")
 	}
 }

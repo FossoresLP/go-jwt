@@ -22,3 +22,8 @@ type Algorithm interface {
 	Verify([]byte, []byte, Header) error
 	Header(*Header)
 }
+
+// VerificationProvider is an interface for verification providers used to validate the content of a JWT
+type VerificationProvider interface {
+	Validate([]byte) error
+}

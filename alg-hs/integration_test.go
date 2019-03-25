@@ -32,8 +32,8 @@ func TestHS256(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not decode JWT: %s", err.Error())
 	}
-	if dec.Valid() != nil {
-		t.Errorf("Decoded JWT could not be validated: %s", dec.Valid().Error())
+	if !dec.Valid() {
+		t.Errorf("Decoded JWT could not be validated: %s", dec.ValidationError().Error())
 	}
 }
 
@@ -58,8 +58,8 @@ func TestHS384(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not decode JWT: %s", err.Error())
 	}
-	if dec.Valid() != nil {
-		t.Errorf("Decoded JWT could not be validated: %s", dec.Valid().Error())
+	if !dec.Valid() {
+		t.Errorf("Decoded JWT could not be validated: %s", dec.ValidationError().Error())
 	}
 }
 
@@ -84,8 +84,8 @@ func TestHS512(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not decode JWT: %s", err.Error())
 	}
-	if dec.Valid() != nil {
-		t.Errorf("Decoded JWT could not be validated: %s", dec.Valid().Error())
+	if !dec.Valid() {
+		t.Errorf("Decoded JWT could not be validated: %s", dec.ValidationError().Error())
 	}
 }
 
