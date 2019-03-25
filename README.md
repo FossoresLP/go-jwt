@@ -34,11 +34,11 @@ type JWT struct {
 
 This package will decode the header of the token using a struct so some values could get lost.
 
-It will try to validate the token using the registered signature algorithms. To get the validation result use `token.Valid()`.
+It will try to validate the token using the registered signature algorithms. To check if the token is valid use `token.Valid()` which returns a boolean. If you want to know the exact error, use `token.ValidationError()`.
 
-Currently only NotBefore (`nbf`) and Expires (`exp`) are checked, but validation modules are in the works.
+The claims of a token can be validated manually or using validation providers. Some of those are included in validationFunctions.go but you can always create your own.
 
-All further handling of the content is in the hands of the user, as the content is exposed as a JSON string (although it is a byte slice).
+All further handling of the content is in the hands of the user, as the content is exposed as JSON (in form of a byte slice).
 
 Usage
 -----
@@ -72,7 +72,8 @@ jwt.Decode(encodedtoken) (JWT, error)
 When decoding a JWT, it is automatically validated but you will have to retieve the result using:
 
 ```go
-token.Valid() (error)
+token.Valid() bool
+token.ValidationError() error
 ```
 
-Keep in mind that this function currently only validates the hash and checks if the token is valid at the current point in time if `exp` and/or `nbf` are set.
+Keep in mind that this only checks if the token was valid when it was decoded and also only using the validation providers registered at that time.
