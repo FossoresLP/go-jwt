@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/fossoreslp/go-jwt"
-	"github.com/fossoreslp/go-jwt/publickey"
 	"golang.org/x/crypto/ed25519"
 )
 
@@ -64,11 +63,8 @@ func TestNewProviderWithKeyURL(t *testing.T) {
 }
 
 func TestLoadProvider(t *testing.T) {
-	ed25519_public := [32]byte{0x0}
-	ed448_public := [56]byte{0x0}
 	type args struct {
 		settings Settings
-		public   publickey.PublicKey
 		curve    int
 	}
 	tests := []struct {
@@ -77,17 +73,15 @@ func TestLoadProvider(t *testing.T) {
 		want    Provider
 		wantErr bool
 	}{
-		{"Ed25519 invalid settings type", args{Settings{}, publickey.New(nil, "key_id"), Ed25519}, Provider{}, true},
-		{"Ed448 invalid settings type", args{Settings{}, publickey.New(nil, "key_id"), Ed448}, Provider{}, true},
-		{"Ed25519 invalid public key type", args{Settings{typ: Ed25519}, publickey.New(nil, "key_id"), Ed25519}, Provider{}, true},
-		{"Ed448 invalid public key type", args{Settings{typ: Ed448}, publickey.New(nil, "key_id"), Ed448}, Provider{}, true},
-		{"Ed25519", args{Settings{typ: Ed25519}, publickey.New(ed25519_public[:], "key_id"), Ed25519}, Provider{Settings{typ: Ed25519}, map[string]ed25519.PublicKey{"": ed25519.PublicKey(ed25519_public[:]), "key_id": ed25519.PublicKey(ed25519_public[:])}, map[string][56]byte{}, Ed25519}, false},
-		{"Ed448", args{Settings{typ: Ed448}, publickey.New(ed448_public[:], "key_id"), Ed448}, Provider{Settings{typ: Ed448}, map[string]ed25519.PublicKey{}, map[string][56]byte{"": ed448_public, "key_id": ed448_public}, Ed448}, false},
-		{"Unknown", args{Settings{}, publickey.PublicKey{}, 12}, Provider{}, true},
+		{"Ed25519 invalid settings type", args{Settings{}, Ed25519}, Provider{}, true},
+		{"Ed448 invalid settings type", args{Settings{}, Ed448}, Provider{}, true},
+		{"Ed25519", args{Settings{typ: Ed25519, ed25519: ed25519_private_key[:], kid: "key_id"}, Ed25519}, Provider{Settings{typ: Ed25519, ed25519: ed25519_private_key[:], kid: "key_id"}, map[string]ed25519.PublicKey{"": ed25519.PublicKey(ed25519_public_key[:]), "key_id": ed25519.PublicKey(ed25519_public_key[:])}, map[string][56]byte{}, Ed25519}, false},
+		{"Ed448", args{Settings{typ: Ed448, ed448: ed448_private_key, kid: "key_id"}, Ed448}, Provider{Settings{typ: Ed448, ed448: ed448_private_key, kid: "key_id"}, map[string]ed25519.PublicKey{}, map[string][56]byte{"": ed448_public_key, "key_id": ed448_public_key}, Ed448}, false},
+		{"Unknown", args{Settings{}, 12}, Provider{}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := LoadProvider(tt.args.settings, tt.args.public, tt.args.curve)
+			got, err := LoadProvider(tt.args.settings, tt.args.curve)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LoadProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -27,11 +27,11 @@ NewProviderWithKeyURL(algorithm int, keyURL string) (Provider, error)
 ### `LoadProvider`
 
 ```go
-LoadProvider(settings SignatureSettings, publickey publickey.PublicKey, algorithm int) (Provider, error)
+LoadProvider(settings SignatureSettings, algorithm int) (Provider, error)
 ```
 
 `LoadProvider` may be provided to enable users to load keys.
-The function must take `SignatureSettings`, `publickey.PublicKey` and an integer indicating the desired algorithm ID.
+The function must take `SignatureSettings` and an integer indicating the desired algorithm ID.
 
 ### `Provider`
 

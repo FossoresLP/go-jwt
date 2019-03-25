@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/fossoreslp/go-jwt"
-	"github.com/fossoreslp/go-jwt/publickey"
 )
 
 func TestNewProviderWithKeyURL(t *testing.T) {
@@ -58,7 +57,7 @@ func TestLoadProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := LoadProvider(tt.args.s, publickey.PublicKey{}, tt.args.t)
+			got, err := LoadProvider(tt.args.s, tt.args.t)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LoadProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return

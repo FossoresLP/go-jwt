@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/fossoreslp/go-jwt"
-	"github.com/fossoreslp/go-jwt/publickey"
 	"github.com/otrv4/ed448"
 	"golang.org/x/crypto/ed25519"
 )
@@ -57,19 +56,14 @@ func NewProviderWithKeyURL(alg int, keyURL string) (Provider, error) {
 }
 
 // LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(settings Settings, public publickey.PublicKey, alg int) (Provider, error) {
+func LoadProvider(settings Settings, alg int) (Provider, error) {
 	if alg == Ed25519 {
 		if settings.typ != Ed25519 {
 			return Provider{}, errors.New("signature settings are not for Ed25519")
 		}
-		id := public.GetKeyID()
-		enc := public.GetPublicKey()
-		if len(enc) != ed25519.PublicKeySize {
-			return Provider{}, errors.New("public key is not for Ed25519")
-		}
 		m := map[string]ed25519.PublicKey{
-			id: ed25519.PublicKey(enc),
-			"": ed25519.PublicKey(enc),
+			settings.kid: settings.ed25519.Public().(ed25519.PublicKey),
+			"":           settings.ed25519.Public().(ed25519.PublicKey),
 		}
 		return Provider{settings, m, make(map[string][56]byte), alg}, nil
 	}
@@ -77,16 +71,11 @@ func LoadProvider(settings Settings, public publickey.PublicKey, alg int) (Provi
 		if settings.typ != Ed448 {
 			return Provider{}, errors.New("signature settings are not for Ed448")
 		}
-		id := public.GetKeyID()
-		enc := public.GetPublicKey()
-		if len(enc) != 56 {
-			return Provider{}, errors.New("public key is not for Ed448")
-		}
 		var dec [56]byte
-		copy(dec[:], enc)
+		copy(dec[:], settings.ed448[56:112])
 		m := map[string][56]byte{
-			id: dec,
-			"": dec,
+			settings.kid: dec,
+			"":           dec,
 		}
 		return Provider{settings, make(map[string]ed25519.PublicKey), m, alg}, nil
 	}

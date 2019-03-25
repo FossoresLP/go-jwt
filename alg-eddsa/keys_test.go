@@ -43,8 +43,8 @@ func Test_generateEd448Keys(t *testing.T) {
 }
 
 var (
-	ed25519_public_key = [32]byte{0xFF}
-	ed448_public_key   = [56]byte{0xFF}
+	ed25519_public_key = [32]byte{0x00}
+	ed448_public_key   = [56]byte{0x00}
 )
 
 func TestProvider_AddPublicKey(t *testing.T) {

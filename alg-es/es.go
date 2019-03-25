@@ -11,7 +11,6 @@ import (
 	"math/big"
 
 	"github.com/fossoreslp/go-jwt"
-	"github.com/fossoreslp/go-jwt/publickey"
 	"github.com/fossoreslp/go-uuid-v4"
 )
 
@@ -102,7 +101,7 @@ func NewProviderWithKeyURL(t int, keyURL string) (Provider, error) {
 
 // LoadProvider returns a Provider using the supplied settings.
 // The public key will be ignored as the settings include all necessary information.
-func LoadProvider(s Settings, _ publickey.PublicKey, t int) (Provider, error) {
+func LoadProvider(s Settings, t int) (Provider, error) {
 	m := map[string]*ecdsa.PublicKey{
 		s.kid: &s.private.PublicKey,
 		"":    &s.private.PublicKey,
