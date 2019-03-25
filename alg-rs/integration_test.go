@@ -8,14 +8,14 @@ import (
 )
 
 func TestRS256(t *testing.T) {
-	p, k, err := NewProvider(RS256)
+	p, err := NewProvider(RS256)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: k[0].GetPublicKey()}
+	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(RS256, p)
-	jwt.DefaultAlgorithm(RS256) // nolint:errcheck
+	jwt.SetAlgorithm("RS256", p)
+	jwt.DefaultAlgorithm("RS256") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -32,14 +32,14 @@ func TestRS256(t *testing.T) {
 }
 
 func TestRS384(t *testing.T) {
-	p, k, err := NewProvider(RS384)
+	p, err := NewProvider(RS384)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: k[0].GetPublicKey()}
+	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(RS384, p)
-	jwt.DefaultAlgorithm(RS384) // nolint:errcheck
+	jwt.SetAlgorithm("RS384", p)
+	jwt.DefaultAlgorithm("RS384") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -56,14 +56,14 @@ func TestRS384(t *testing.T) {
 }
 
 func TestRS512(t *testing.T) {
-	p, k, err := NewProvider(RS512)
+	p, err := NewProvider(RS512)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: k[0].GetPublicKey()}
+	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(RS512, p)
-	jwt.DefaultAlgorithm(RS512) // nolint:errcheck
+	jwt.SetAlgorithm("RS512", p)
+	jwt.DefaultAlgorithm("RS512") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {

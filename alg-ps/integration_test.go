@@ -5,18 +5,19 @@ import (
 	"testing"
 
 	"github.com/fossoreslp/go-jwt"
+	"github.com/fossoreslp/go-jwt/publickey"
 )
 
 func TestPS256(t *testing.T) {
-	p, k, err := NewProvider(PS256)
+	p, err := NewProvider(PS256)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := k[0].GetPublicKey()
+	rk := p.CurrentKey().GetPublicKey()
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(PS256, p)
-	jwt.DefaultAlgorithm(PS256) // nolint:errcheck
+	jwt.SetAlgorithm("PS256", p)
+	jwt.DefaultAlgorithm("PS256") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -33,15 +34,15 @@ func TestPS256(t *testing.T) {
 }
 
 func TestPS384(t *testing.T) {
-	p, k, err := NewProvider(PS384)
+	p, err := NewProvider(PS384)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := k[0].GetPublicKey()
+	rk := p.CurrentKey().GetPublicKey()
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(PS384, p)
-	jwt.DefaultAlgorithm(PS384) // nolint:errcheck
+	jwt.SetAlgorithm("PS384", p)
+	jwt.DefaultAlgorithm("PS384") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -58,15 +59,15 @@ func TestPS384(t *testing.T) {
 }
 
 func TestPS512(t *testing.T) {
-	p, k, err := NewProvider(PS512)
+	p, err := NewProvider(PS512)
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := k[0].GetPublicKey()
+	rk := p.CurrentKey().GetPublicKey()
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm(PS512, p)
-	jwt.DefaultAlgorithm(PS512) // nolint:errcheck
+	jwt.SetAlgorithm("PS512", p)
+	jwt.DefaultAlgorithm("PS512") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -94,15 +95,19 @@ o2kQ+X5xK9cipRgEKwIDAQAB
 	if key == nil {
 		t.Errorf("Key could not be read")
 	}
-	ks := KeySet{}
-	err := ks.SetKeys(nil, key.Bytes)
+	settings, err := NewSettings(pkcs1, "key_id")
 	if err != nil {
 		t.Errorf("Could not decode key: %s", err.Error())
 		t.FailNow()
 	}
-	p, _ := LoadProvider(ks, PS384)
-	jwt.SetAlgorithm(PS384, p)
-	jwt.DefaultAlgorithm(PS384) // nolint:errcheck
+	p, _ := LoadProvider(settings, PS384)
+	p.RemovePublicKey("")
+	err = p.AddPublicKey(publickey.New(key.Bytes, ""))
+	if err != nil {
+		t.Errorf("Could not add public key: %s", err.Error())
+	}
+	jwt.SetAlgorithm("PS384", p)
+	jwt.DefaultAlgorithm("PS384") // nolint:errcheck
 	dec, err := jwt.Decode(token)
 	if err != nil {
 		t.Errorf("Could not decode JWT: %s", err.Error())
