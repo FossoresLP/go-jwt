@@ -60,7 +60,7 @@ In case additional fields in the header are necessary, please open an issue on G
 
 `RemovePublicKey(keyid string)` removes a public key by key ID from the verification set. This can be used to remove compromised keys. It is a noop for the public key belonging to the private key used for signing.
 
-`CurrentKey() publickey.PublicKey` returns the public key belonging to the private key used for signing.
+`CurrentKey() publickey.PublicKey` returns the public key belonging to the private key used for signing. The key should be properly encoded so it can easily be encoded to PEM or transferred in binary with the least possible overhead.
 
 ### `SignatureSettings`
 
