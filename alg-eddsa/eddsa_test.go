@@ -75,8 +75,8 @@ func TestLoadProvider(t *testing.T) {
 	}{
 		{"Ed25519 invalid settings type", args{Settings{}, Ed25519}, Provider{}, true},
 		{"Ed448 invalid settings type", args{Settings{}, Ed448}, Provider{}, true},
-		{"Ed25519", args{Settings{typ: Ed25519, ed25519: ed25519_private_key[:], kid: "key_id"}, Ed25519}, Provider{Settings{typ: Ed25519, ed25519: ed25519_private_key[:], kid: "key_id"}, map[string]ed25519.PublicKey{"": ed25519.PublicKey(ed25519_public_key[:]), "key_id": ed25519.PublicKey(ed25519_public_key[:])}, map[string][56]byte{}, Ed25519}, false},
-		{"Ed448", args{Settings{typ: Ed448, ed448: ed448_private_key, kid: "key_id"}, Ed448}, Provider{Settings{typ: Ed448, ed448: ed448_private_key, kid: "key_id"}, map[string]ed25519.PublicKey{}, map[string][56]byte{"": ed448_public_key, "key_id": ed448_public_key}, Ed448}, false},
+		{"Ed25519", args{Settings{typ: Ed25519, ed25519: ed25519PrivateKey[:], kid: "key_id"}, Ed25519}, Provider{Settings{typ: Ed25519, ed25519: ed25519PrivateKey[:], kid: "key_id"}, map[string]ed25519.PublicKey{"": ed25519.PublicKey(ed25519PublicKey[:]), "key_id": ed25519.PublicKey(ed25519PublicKey[:])}, map[string][56]byte{}, Ed25519}, false},
+		{"Ed448", args{Settings{typ: Ed448, ed448: ed448PrivateKey, kid: "key_id"}, Ed448}, Provider{Settings{typ: Ed448, ed448: ed448PrivateKey, kid: "key_id"}, map[string]ed25519.PublicKey{}, map[string][56]byte{"": ed448PublicKey, "key_id": ed448PublicKey}, Ed448}, false},
 		{"Unknown", args{Settings{}, 12}, Provider{}, true},
 	}
 	for _, tt := range tests {

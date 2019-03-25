@@ -32,7 +32,7 @@ func (p *Provider) AddPublicKey(key publickey.PublicKey) error {
 	return errors.New("key has invalid length")
 }
 
-// Remove public key removes a public key by it's key ID from the verification set
+// RemovePublicKey removes a public key by it's key ID from the verification set
 func (p *Provider) RemovePublicKey(keyid string) {
 	if keyid == p.settings.kid {
 		return

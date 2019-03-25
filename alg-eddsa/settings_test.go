@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ed25519_private_key     = [64]byte{0xFF}
-	ed448_private_key       = [144]byte{0xFF}
-	ed448_empty_private_key = [144]byte{0x0}
+	ed25519PrivateKey    = [64]byte{0xFF}
+	ed448PrivateKey      = [144]byte{0xFF}
+	ed448EmptyPrivateKey = [144]byte{0x0}
 )
 
 func TestNewSettings(t *testing.T) {
@@ -25,7 +25,7 @@ func TestNewSettings(t *testing.T) {
 		want    Settings
 		wantErr bool
 	}{
-		{"Normal", args{ed25519_private_key[:], "key_id"}, Settings{Ed25519, ed25519.PrivateKey(ed25519_private_key[:]), ed448_empty_private_key, "key_id", ""}, false},
+		{"Normal", args{ed25519PrivateKey[:], "key_id"}, Settings{Ed25519, ed25519.PrivateKey(ed25519PrivateKey[:]), ed448EmptyPrivateKey, "key_id", ""}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -53,8 +53,8 @@ func TestNewSettingsWithKeyURL(t *testing.T) {
 		want    Settings
 		wantErr bool
 	}{
-		{"Ed25519", args{ed25519_private_key[:], "key_id", "key_url"}, Settings{Ed25519, ed25519.PrivateKey(ed25519_private_key[:]), ed448_empty_private_key, "key_id", "key_url"}, false},
-		{"Ed448", args{ed448_private_key[:], "key_id", "key_url"}, Settings{Ed448, ed25519.PrivateKey(nil), ed448_private_key, "key_id", "key_url"}, false},
+		{"Ed25519", args{ed25519PrivateKey[:], "key_id", "key_url"}, Settings{Ed25519, ed25519.PrivateKey(ed25519PrivateKey[:]), ed448EmptyPrivateKey, "key_id", "key_url"}, false},
+		{"Ed448", args{ed448PrivateKey[:], "key_id", "key_url"}, Settings{Ed448, ed25519.PrivateKey(nil), ed448PrivateKey, "key_id", "key_url"}, false},
 		{"Wrong length", args{nil, "key_id", "key_url"}, Settings{}, true},
 	}
 	for _, tt := range tests {

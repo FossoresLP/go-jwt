@@ -56,7 +56,7 @@ func (p *Provider) AddPublicKey(key publickey.PublicKey) error {
 	return nil
 }
 
-// Remove public key removes a public key by it's key ID from the verification set
+// RemovePublicKey removes a public key by it's key ID from the verification set
 func (p *Provider) RemovePublicKey(keyid string) {
 	if keyid == p.settings.kid {
 		return
