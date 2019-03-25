@@ -11,6 +11,7 @@ import (
 	"math/big"
 
 	"github.com/fossoreslp/go-jwt"
+	"github.com/fossoreslp/go-jwt/publickey"
 	"github.com/fossoreslp/go-uuid-v4"
 )
 
@@ -99,8 +100,9 @@ func NewProviderWithKeyURL(t int, keyURL string) (Provider, error) {
 	return Provider{c.alg, c.hash, Settings{key, kid, keyURL}, m, c.ilen}, nil
 }
 
-// LoadProvider returns a Provider using the supplied keypairs
-func LoadProvider(s Settings, t int) (Provider, error) {
+// LoadProvider returns a Provider using the supplied settings.
+// The public key will be ignored as the settings include all necessary information.
+func LoadProvider(s Settings, _ publickey.PublicKey, t int) (Provider, error) {
 	m := map[string]*ecdsa.PublicKey{
 		s.kid: &s.private.PublicKey,
 		"":    &s.private.PublicKey,
@@ -172,7 +174,11 @@ func (p Provider) Verify(data, sig []byte, h jwt.Header) error {
 	s := big.Int{}
 	r.SetBytes(sig[:p.ilen])
 	s.SetBytes(sig[p.ilen:])
-	if ecdsa.Verify(&p.settings.private.PublicKey, hash.Sum(nil), &r, &s) {
+	pub, ok := p.keys[h.Kid]
+	if !ok {
+		return errors.New("unknown key id")
+	}
+	if ecdsa.Verify(pub, hash.Sum(nil), &r, &s) {
 		return nil
 	}
 	return errors.New("signature invalid")

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/fossoreslp/go-jwt"
+	"github.com/fossoreslp/go-jwt/publickey"
 )
 
 func TestNewProviderWithKeyURL(t *testing.T) {
@@ -57,7 +58,7 @@ func TestLoadProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := LoadProvider(tt.args.s, tt.args.t)
+			got, err := LoadProvider(tt.args.s, publickey.PublicKey{}, tt.args.t)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LoadProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -125,6 +126,10 @@ func TestProvider_Verify(t *testing.T) {
 	}
 	b2 := [64]byte{0xFF}
 	if p.Verify([]byte("test"), b2[:], jwt.Header{}) == nil {
+		t.Error("Verify() did not return an error when encountering an unknown key ID")
+	}
+	p.keys = map[string]*ecdsa.PublicKey{"key_id": &ecdsa.PublicKey{Curve: elliptic.P256(), X: x, Y: y}}
+	if p.Verify([]byte("test"), b2[:], jwt.Header{Kid: "key_id"}) == nil {
 		t.Error("Verify() did not return an error when encountering a wrong signature")
 	}
 }
