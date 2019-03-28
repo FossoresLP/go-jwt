@@ -7,7 +7,7 @@ import (
 
 func TestJWT_MarshalText(t *testing.T) {
 	SetAlgorithm("test", TestAlgorithm("test"))
-	DefaultAlgorithm("test") // nolint:errcheck
+	SetSigningAlgorithm("test") // nolint:errcheck
 	tests := []struct {
 		name    string
 		jwt     JWT
@@ -32,7 +32,7 @@ func TestJWT_MarshalText(t *testing.T) {
 
 func TestJWT_UnmarshalText(t *testing.T) {
 	SetAlgorithm("test", TestAlgorithm("test"))
-	DefaultAlgorithm("test") // nolint:errcheck
+	SetSigningAlgorithm("test") // nolint:errcheck
 	type args struct {
 		in []byte
 	}
@@ -60,7 +60,7 @@ func TestJWT_UnmarshalText(t *testing.T) {
 
 func TestJWT_MarshalBinary(t *testing.T) {
 	SetAlgorithm("test", TestAlgorithm("test"))
-	DefaultAlgorithm("test") // nolint:errcheck
+	SetSigningAlgorithm("test") // nolint:errcheck
 	tests := []struct {
 		name    string
 		jwt     JWT
@@ -85,7 +85,7 @@ func TestJWT_MarshalBinary(t *testing.T) {
 
 func TestJWT_UnmarshalBinary(t *testing.T) {
 	SetAlgorithm("test", TestAlgorithm("test"))
-	DefaultAlgorithm("test") // nolint:errcheck
+	SetSigningAlgorithm("test") // nolint:errcheck
 	type args struct {
 		in []byte
 	}

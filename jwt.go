@@ -29,8 +29,8 @@ func SetAlgorithm(name string, alg Algorithm) {
 	algorithms[name] = alg
 }
 
-// DefaultAlgorithm sets the default algorithm that will be used with Encode and by the Marshalers for encoding
-func DefaultAlgorithm(name string) error {
+// SetSigningAlgorithm sets the default algorithm that will be used with Encode and by the Marshalers for encoding
+func SetSigningAlgorithm(name string) error {
 	if _, ok := algorithms[name]; !ok {
 		return errors.New("algorithm does not exist")
 	}

@@ -88,7 +88,7 @@ func TestDefaultAlgorithm(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := DefaultAlgorithm(tt.args.name); (err != nil) != tt.wantErr {
+			if err := SetSigningAlgorithm(tt.args.name); (err != nil) != tt.wantErr {
 				t.Errorf("DefaultAlgorithm() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && defaultAlgorithm != tt.args.name {

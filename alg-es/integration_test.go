@@ -16,7 +16,7 @@ func TestES256(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk.GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm(algToString(ES256), p)
-	jwt.DefaultAlgorithm(algToString(ES256)) // nolint:errcheck
+	jwt.SetSigningAlgorithm(algToString(ES256)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -41,7 +41,7 @@ func TestES384(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk.GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm(algToString(ES384), p)
-	jwt.DefaultAlgorithm(algToString(ES384)) // nolint:errcheck
+	jwt.SetSigningAlgorithm(algToString(ES384)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -66,7 +66,7 @@ func TestES512(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk.GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm(algToString(ES512), p)
-	jwt.DefaultAlgorithm(algToString(ES512)) // nolint:errcheck
+	jwt.SetSigningAlgorithm(algToString(ES512)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {

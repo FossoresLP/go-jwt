@@ -15,7 +15,7 @@ func TestRS256(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm("RS256", p)
-	jwt.DefaultAlgorithm("RS256") // nolint:errcheck
+	jwt.SetSigningAlgorithm("RS256") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -39,7 +39,7 @@ func TestRS384(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm("RS384", p)
-	jwt.DefaultAlgorithm("RS384") // nolint:errcheck
+	jwt.SetSigningAlgorithm("RS384") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
@@ -63,7 +63,7 @@ func TestRS512(t *testing.T) {
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetAlgorithm("RS512", p)
-	jwt.DefaultAlgorithm("RS512") // nolint:errcheck
+	jwt.SetSigningAlgorithm("RS512") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
 	if err != nil {
