@@ -9,11 +9,21 @@ Modular JWT / JWS provider in Golang
 
 This packages implements JSON Web Token as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519) in Go.
 
-This package is not capable of validating signatures on it's own. It has a modular architecture and needs modules providing signature algorithms.
+It is build with a modular architecture to make it easy to adapt to most use cases.
 
-The default algorithms specified in [RFC7518](https://tools.ietf.org/html/rfc7518) and [RFC8037](https://tools.ietf.org/html/rfc8037) can be found in sub-packages in this repository.
+For this reason all verification of signatures and contents is implemented independently and does explicitly have to be activated.
+
+All tokens decoded by this package will automatically be validated using the activated signature and content verification providers. To check if the token is valid use `token.Valid()` which returns a boolean. If you want to know the exact error, use `token.ValidationError()`.
+
+The default algorithms for signature verification specified in [RFC7518](https://tools.ietf.org/html/rfc7518) and [RFC8037](https://tools.ietf.org/html/rfc8037) can be found in sub-packages in this repository.
 
 EdDSA with Ed25519 and Ed448 (unstable), HMAC-SHA2, RSA PKCS#1 v1.5, RSA-PSS and ECDSA can all be found in the respective folders.
+
+You may add a signature algorithm by calling `RegisterAlgorithm(name string, alg Algorithm) error` with name being the value of the `alg` header this algorithm uses and alg being a properly initialized instance of the respective algorithm. To enable signing and select the algorithm to use, call `SetSigningAlgorithm(name string) error` with the name of the algorithm to use.
+
+The main package includes some implementations of content validation in `validationFunctions.go`. To add a content validator, call `AddValidationProvider(name string, provider VerificationProvider) error` with a name of your choosing and the initialized provider. It will automatically be used to validate all tokens that are decoded after adding it.
+
+In case the providers included in this package do not fit your needs, you can always implement your own. For details see `API.md`.
 
 Data structures
 ---------------
@@ -32,20 +42,14 @@ type JWT struct {
 }
 ```
 
-This package will decode the header of the token using a struct so some values could get lost.
-
-It will try to validate the token using the registered signature algorithms. To check if the token is valid use `token.Valid()` which returns a boolean. If you want to know the exact error, use `token.ValidationError()`.
-
-The claims of a token can be validated manually or using validation providers. Some of those are included in validationFunctions.go but you can always create your own.
-
-All further handling of the content is in the hands of the user, as the content is exposed as JSON (in form of a byte slice).
+Due to the header being a struct some values may be ignored when decoding.
 
 Usage
 -----
 
 ### Generating a new JWT
 
-Creating a JWT is quite easy. You just have to supply your content and this package will generate a JWT for you. New will return an error when an unsupported content type is used. Supported content types are structs and maps with strings as keys.
+Creating a JWT is quite easy. You just have to supply your content encoded as JSON and this package will generate a JWT for you.
 
 ```go
 jwt.New(content []byte) (JWT, error)
@@ -55,8 +59,10 @@ jwt.New(content []byte) (JWT, error)
 
 To actually use a JWT you will have to encode it. This is done by simply calling `Encode` on the JWT you created.
 
+Please note that you will need to add a signature provider first and also set the singing provider to use.
+
 ```go
-token.Encode() (string, error)
+token.Encode() ([]byte, error)
 ```
 
 ### Decoding a JWT
@@ -64,7 +70,7 @@ token.Encode() (string, error)
 To validate a JWT you will first have to decode it. Just supply it to the `Decode` function.
 
 ```go
-jwt.Decode(encodedtoken) (JWT, error)
+jwt.Decode(encodedtoken []byte) (JWT, error)
 ```
 
 ### Validating the hash
@@ -77,3 +83,4 @@ token.ValidationError() error
 ```
 
 Keep in mind that this only checks if the token was valid when it was decoded and also only using the validation providers registered at that time.
+You will also need to add the signature validation provider and add the necessary keys before decoding the token or it will be treated as invalid.
