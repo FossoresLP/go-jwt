@@ -20,7 +20,7 @@ func TestHS256(t *testing.T) {
 	bk := make([]byte, base64.StdEncoding.EncodedLen(len(rk.GetPublicKey())))
 	base64.StdEncoding.Encode(bk, rk.GetPublicKey())
 	t.Logf("Created provider with key: %s", string(bk))
-	jwt.SetAlgorithm(algToString(HS256), p)
+	jwt.SetSignatureProvider(algToString(HS256), p)
 	jwt.SetSigningAlgorithm(algToString(HS256)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
@@ -46,7 +46,7 @@ func TestHS384(t *testing.T) {
 	bk := make([]byte, base64.StdEncoding.EncodedLen(len(rk.GetPublicKey())))
 	base64.StdEncoding.Encode(bk, rk.GetPublicKey())
 	t.Logf("Created provider with key: %s", string(bk))
-	jwt.SetAlgorithm(algToString(HS384), p)
+	jwt.SetSignatureProvider(algToString(HS384), p)
 	jwt.SetSigningAlgorithm(algToString(HS384)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
@@ -72,7 +72,7 @@ func TestHS512(t *testing.T) {
 	bk := make([]byte, base64.StdEncoding.EncodedLen(len(rk.GetPublicKey())))
 	base64.StdEncoding.Encode(bk, rk.GetPublicKey())
 	t.Logf("Created provider with key: %s", string(bk))
-	jwt.SetAlgorithm(algToString(HS512), p)
+	jwt.SetSignatureProvider(algToString(HS512), p)
 	jwt.SetSigningAlgorithm(algToString(HS512)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()

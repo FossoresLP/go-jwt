@@ -19,9 +19,9 @@ The default algorithms for signature verification specified in [RFC7518](https:/
 
 EdDSA with Ed25519 and Ed448 (unstable), HMAC-SHA2, RSA PKCS#1 v1.5, RSA-PSS and ECDSA can all be found in the respective folders.
 
-You may add a signature algorithm by calling `RegisterAlgorithm(name string, alg Algorithm) error` with name being the value of the `alg` header this algorithm uses and alg being a properly initialized instance of the respective algorithm. To enable signing and select the algorithm to use, call `SetSigningAlgorithm(name string) error` with the name of the algorithm to use.
+You may add a signature provider by calling `AddSignatureProvider(name string, provider SignatureProvider) error` with name being the value of the `alg` header this algorithm uses and alg being a properly initialized instance of the respective algorithm. To enable signing and select the algorithm to use, call `SetSigningAlgorithm(name string) error` with the name of the algorithm to use.
 
-The main package includes some implementations of content validation in `validationFunctions.go`. To add a content validator, call `AddValidationProvider(name string, provider VerificationProvider) error` with a name of your choosing and the initialized provider. It will automatically be used to validate all tokens that are decoded after adding it.
+The main package includes some implementations of content validation providers in `contentValidation.go`. To add a content validator, call `AddValidationProvider(name string, provider ContentValidationProvider) error` with a name of your choosing and the initialized provider. It will automatically be used to validate all tokens that are decoded after adding it.
 
 In case the providers included in this package do not fit your needs, you can always implement your own. For details see `API.md`.
 

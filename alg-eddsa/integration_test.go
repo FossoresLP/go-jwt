@@ -11,7 +11,7 @@ func TestEd25519(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	jwt.SetAlgorithm("EdDSA", p)
+	jwt.SetSignatureProvider("EdDSA", p)
 	jwt.SetSigningAlgorithm("EdDSA") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
@@ -33,7 +33,7 @@ func TestEd448(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	jwt.SetAlgorithm("EdDSA", p)
+	jwt.SetSignatureProvider("EdDSA", p)
 	jwt.SetSigningAlgorithm("EdDSA") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()

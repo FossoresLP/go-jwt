@@ -44,12 +44,12 @@ func TestJWT_ValidationError(t *testing.T) {
 
 func TestHeader_getAlgorithm(t *testing.T) {
 	alg := TestAlgorithm("test")
-	SetAlgorithm("test", alg)
+	SetSignatureProvider("test", alg)
 	SetSigningAlgorithm("test") // nolint:errcheck
 	tests := []struct {
 		name    string
 		h       Header
-		want    Algorithm
+		want    SignatureProvider
 		wantErr bool
 	}{
 		{"Normal", Header{Typ: "JWT", Alg: "test"}, alg, false},
@@ -104,7 +104,7 @@ func (_ testValidationProvider) Validate(c []byte) error {
 
 func TestValidation(t *testing.T) {
 	alg := TestAlgorithm("test")
-	SetAlgorithm("test", alg)
+	SetSignatureProvider("test", alg)
 	SetSigningAlgorithm("test") // nolint:errcheck
 
 	token := JWT{Header{Typ: "JWT", Alg: "test"}, []byte{0x00}, nil}

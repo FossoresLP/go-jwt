@@ -7,7 +7,7 @@ import (
 func TestAddValidationProvider(t *testing.T) {
 	type args struct {
 		name     string
-		provider VerificationProvider
+		provider ContentValidationProvider
 	}
 	tests := []struct {
 		name    string
@@ -36,6 +36,20 @@ func TestRemoveValidationProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			RemoveValidationProvider(tt.pname)
+		})
+	}
+}
+
+func TestRemoveSignatureProvider(t *testing.T) {
+	tests := []struct {
+		name  string
+		pname string
+	}{
+		{"Normal", "test"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			RemoveSignatureProvider(tt.pname)
 		})
 	}
 }

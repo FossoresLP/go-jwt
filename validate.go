@@ -33,8 +33,8 @@ func (jwt JWT) validate(data, signature []byte) error {
 	return nil
 }
 
-func (h Header) getAlgorithm() (Algorithm, error) {
-	a, ok := algorithms[h.Alg]
+func (h Header) getAlgorithm() (SignatureProvider, error) {
+	a, ok := signatureProviders[h.Alg]
 	if !ok {
 		return nil, fmt.Errorf("algorithm %s is not supported", h.Alg)
 	}

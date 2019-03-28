@@ -5,47 +5,54 @@ import (
 )
 
 var (
-	algorithms          map[string]Algorithm
+	signatureProviders  map[string]SignatureProvider
 	defaultAlgorithm    string
-	validationProviders map[string]VerificationProvider
+	validationProviders map[string]ContentValidationProvider
 )
 
 func init() {
-	algorithms = make(map[string]Algorithm)
-	validationProviders = make(map[string]VerificationProvider)
+	signatureProviders = make(map[string]SignatureProvider)
+	validationProviders = make(map[string]ContentValidationProvider)
 }
 
-// RegisterAlgorithm tries to add the algorithm to the list but fails when one with the same name already exists.
-func RegisterAlgorithm(name string, alg Algorithm) error {
-	if _, ok := algorithms[name]; ok {
-		return errors.New("algorithm already registered: use SetAlgorithm to force replacement")
+// AddSignatureProvider tries to add the signature provider to the list but fails when one with the same name already exists.
+func AddSignatureProvider(name string, provider SignatureProvider) error {
+	if _, ok := signatureProviders[name]; ok {
+		return errors.New("algorithm already registered: use SetSignatureProvider to force replacement")
 	}
-	algorithms[name] = alg
+	signatureProviders[name] = provider
 	return nil
 }
 
-// SetAlgorithm sets the algorithm ignoring previous settings for the name.
-func SetAlgorithm(name string, alg Algorithm) {
-	algorithms[name] = alg
+// SetSignatureProvider sets the signature provider ignoring previous settings for the same name.
+func SetSignatureProvider(name string, provider SignatureProvider) {
+	signatureProviders[name] = provider
+}
+
+// RemoveSignatureProvider removes a signature provider by name
+func RemoveSignatureProvider(name string) {
+	delete(signatureProviders, name)
 }
 
 // SetSigningAlgorithm sets the default algorithm that will be used with Encode and by the Marshalers for encoding
 func SetSigningAlgorithm(name string) error {
-	if _, ok := algorithms[name]; !ok {
+	if _, ok := signatureProviders[name]; !ok {
 		return errors.New("algorithm does not exist")
 	}
 	defaultAlgorithm = name
 	return nil
 }
 
-func AddValidationProvider(name string, provider VerificationProvider) error {
+// AddValidationProvider adds a content validation provider
+func AddValidationProvider(name string, provider ContentValidationProvider) error {
 	if _, ok := validationProviders[name]; ok {
-		return errors.New("there is already a validation function with this name registered")
+		return errors.New("there is already a content validation provider with this name")
 	}
 	validationProviders[name] = provider
 	return nil
 }
 
+// RemoveValidationProvider removes a content validation provider by name
 func RemoveValidationProvider(name string) {
 	delete(validationProviders, name)
 }

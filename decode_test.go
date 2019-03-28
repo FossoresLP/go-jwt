@@ -6,7 +6,7 @@ import (
 )
 
 func TestDecode(t *testing.T) {
-	SetAlgorithm("test", TestAlgorithm("test"))
+	SetSignatureProvider("test", TestAlgorithm("test"))
 	SetSigningAlgorithm("test") // nolint:errcheck
 	tests := []struct {
 		name     string

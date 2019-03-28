@@ -16,7 +16,7 @@ func TestPS256(t *testing.T) {
 	rk := p.CurrentKey().GetPublicKey()
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm("PS256", p)
+	jwt.SetSignatureProvider("PS256", p)
 	jwt.SetSigningAlgorithm("PS256") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
@@ -41,7 +41,7 @@ func TestPS384(t *testing.T) {
 	rk := p.CurrentKey().GetPublicKey()
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm("PS384", p)
+	jwt.SetSignatureProvider("PS384", p)
 	jwt.SetSigningAlgorithm("PS384") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
@@ -66,7 +66,7 @@ func TestPS512(t *testing.T) {
 	rk := p.CurrentKey().GetPublicKey()
 	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: rk}
 	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
-	jwt.SetAlgorithm("PS512", p)
+	jwt.SetSignatureProvider("PS512", p)
 	jwt.SetSigningAlgorithm("PS512") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
 	res, err := token.Encode()
@@ -106,7 +106,7 @@ o2kQ+X5xK9cipRgEKwIDAQAB
 	if err != nil {
 		t.Errorf("Could not add public key: %s", err.Error())
 	}
-	jwt.SetAlgorithm("PS384", p)
+	jwt.SetSignatureProvider("PS384", p)
 	jwt.SetSigningAlgorithm("PS384") // nolint:errcheck
 	dec, err := jwt.Decode(token)
 	if err != nil {

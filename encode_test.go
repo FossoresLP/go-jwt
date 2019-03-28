@@ -92,7 +92,7 @@ func TestJWT_Encode(t *testing.T) {
 	tests := []struct {
 		name       string
 		t          JWT
-		alg        Algorithm
+		alg        SignatureProvider
 		wantResult []byte
 		wantErr    bool
 	}{
@@ -101,7 +101,7 @@ func TestJWT_Encode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			SetAlgorithm("test", tt.alg)
+			SetSignatureProvider("test", tt.alg)
 			SetSigningAlgorithm("test") // nolint:errcheck
 			gotResult, err := tt.t.Encode()
 			if (err != nil) != tt.wantErr {

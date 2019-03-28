@@ -16,14 +16,14 @@ type JWT struct {
 	validationError error
 }
 
-// Algorithm is an interface for algorithms used to sign and validate a JWS
-type Algorithm interface {
+// SignatureProvider is an interface for algorithms used to sign and validate a JWS
+type SignatureProvider interface {
 	Sign([]byte) ([]byte, error)
 	Verify([]byte, []byte, Header) error
 	Header(*Header)
 }
 
-// VerificationProvider is an interface for verification providers used to validate the content of a JWT
-type VerificationProvider interface {
+// ContentValidationProvider is an interface for verification providers used to validate the content of a JWT
+type ContentValidationProvider interface {
 	Validate([]byte) error
 }

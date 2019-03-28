@@ -30,7 +30,7 @@ func (alg TestAlgorithm) Header(h *Header) {
 func TestRegisterAlgorithm(t *testing.T) {
 	type args struct {
 		name string
-		alg  Algorithm
+		alg  SignatureProvider
 	}
 	tests := []struct {
 		name    string
@@ -42,10 +42,10 @@ func TestRegisterAlgorithm(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := RegisterAlgorithm(tt.args.name, tt.args.alg); (err != nil) != tt.wantErr {
+			if err := AddSignatureProvider(tt.args.name, tt.args.alg); (err != nil) != tt.wantErr {
 				t.Errorf("RegisterAlgorithm() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if a, ok := algorithms[tt.args.name]; !tt.wantErr && (!ok || a != tt.args.alg) {
+			if a, ok := signatureProviders[tt.args.name]; !tt.wantErr && (!ok || a != tt.args.alg) {
 				t.Errorf("RegisterAlgorithm() failed - want %v but got %v", tt.args.alg, a)
 			}
 		})
@@ -55,7 +55,7 @@ func TestRegisterAlgorithm(t *testing.T) {
 func TestSetAlgorithm(t *testing.T) {
 	type args struct {
 		name string
-		alg  Algorithm
+		alg  SignatureProvider
 	}
 	tests := []struct {
 		name string
@@ -65,8 +65,8 @@ func TestSetAlgorithm(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			SetAlgorithm(tt.args.name, tt.args.alg)
-			if a, ok := algorithms[tt.args.name]; !ok || a != tt.args.alg {
+			SetSignatureProvider(tt.args.name, tt.args.alg)
+			if a, ok := signatureProviders[tt.args.name]; !ok || a != tt.args.alg {
 				t.Errorf("SetAlgorithm() failed - want %v but got %v", tt.args.alg, a)
 			}
 		})
@@ -74,7 +74,7 @@ func TestSetAlgorithm(t *testing.T) {
 }
 
 func TestDefaultAlgorithm(t *testing.T) {
-	SetAlgorithm("test", TestAlgorithm("test"))
+	SetSignatureProvider("test", TestAlgorithm("test"))
 	type args struct {
 		name string
 	}

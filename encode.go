@@ -17,7 +17,7 @@ func (t JWT) Encode() ([]byte, error) {
 	if defaultAlgorithm == "" {
 		return nil, errors.New("default algorithm is not set - cannot sign JWT")
 	}
-	alg := algorithms[defaultAlgorithm]
+	alg := signatureProviders[defaultAlgorithm]
 	if alg == nil {
 		return nil, errors.New("cannot access default algorithm")
 	}
