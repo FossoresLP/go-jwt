@@ -26,7 +26,6 @@ LoadProvider(settings Settings, algorithm int) (Provider, error)
 There are two ways to initialize this package:
 
 - Generate a new key using `NewProvider` which optionally may also include a key URL. Note that you will need to upload the public key to the key store manually.
-
 - Load an existing key by creating a new `Settings` struct using `NewSettings` supplying the key as a byte slice (not encoded) and then calling `LoadProvider` with the settings.
 
 The provider has to be registered using the name `HSxxx` to be compliant with RFC 7518. It will be able to sign and verify keys for the specified byte size only.

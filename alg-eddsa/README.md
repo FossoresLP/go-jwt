@@ -30,7 +30,6 @@ LoadProvider(settings Settings, algorithm int) (Provider, error)
 There are two ways to initialize this package:
 
 - Generate a new key using `NewProvider` which optionally may also include a key URL. Note that you will need to upload the public key to the key store manually.
-
 - Load an existing key by creating a new `Settings` struct using `NewSettings` supplying the key as a byte slice (not encoded) and then calling `LoadProvider` with the settings.
 
 **Important:** Ed448 currently does not support the private key format defined in RFC 8032. It uses a 144 byte private key consisting of the private, public and symmetric key in that order.
