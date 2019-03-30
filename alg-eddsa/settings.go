@@ -22,8 +22,8 @@ func NewSettings(key []byte, keyid string) (Settings, error) {
 
 // NewSettingsWithKeyURL creates new signature settings for the parameters
 func NewSettingsWithKeyURL(key []byte, keyid, keyurl string) (Settings, error) {
-	if len(key) == ed25519.PrivateKeySize {
-		return Settings{Ed25519, ed25519.PrivateKey(key), [144]byte{0x00}, keyid, keyurl}, nil
+	if len(key) == ed25519.SeedSize {
+		return Settings{Ed25519, ed25519.NewKeyFromSeed(key), [144]byte{0x00}, keyid, keyurl}, nil
 	}
 	if len(key) == 144 {
 		var priv [144]byte

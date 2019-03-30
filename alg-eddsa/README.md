@@ -33,6 +33,8 @@ There are two ways to initialize this package:
 
 - Load an existing key by creating a new `Settings` struct using `NewSettings` supplying the key as a byte slice (not encoded) and then calling `LoadProvider` with the settings.
 
+**Important:** Ed448 currently does not support the private key format defined in RFC 8032. It uses a 144 byte private key consisting of the private, public and symmetric key in that order.
+
 The provider has to be registered using the name `EdDSA` to be compliant with RFC 8037. It will be able to verify signatures generated using both Ed25519 and Ed448 but can only sign using the algorithm selected on initialization.
 
 Managing public keys
