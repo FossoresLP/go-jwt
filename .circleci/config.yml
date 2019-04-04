@@ -47,25 +47,6 @@ jobs:
       - run:
           name: Upload coverage
           command: ./uploader.run
-  golangci-lint:
-    docker:
-      - image: golang:alpine
-    working_directory: ~/jwt
-    steps:
-      - run: apk add git build-base curl jq
-      - checkout
-      - run: go version | grep -o "[0-9]*\.[0-9]*\.*[0-9]*" > vgo
-      - run: curl -s https://api.github.com/repos/golangci/golangci-lint/releases/latest | jq -r .tag_name > vlinter
-      - restore_cache:
-          key: linter{{checksum "vlinter"}}_go{{checksum "vgo"}}_v2
-      - run: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-      - save_cache:
-          key: linter{{checksum "vlinter"}}_go{{checksum "vgo"}}
-          paths:
-            - /go
-      - run:
-          name: golangci-lint
-          command: golangci-lint run
 
 workflows:
   version: 2
@@ -73,4 +54,3 @@ workflows:
     jobs:
       - go-test
       - coverage
-      - golangci-lint
