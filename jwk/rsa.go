@@ -36,23 +36,18 @@ func (k JWK) GetRSAPublicKey() (*rsa.PublicKey, error) {
 }
 
 func NewRSAPrivateKey(key *rsa.PrivateKey, keyID string) JWK {
-	n := key.N.Bytes()
-	e := big.NewInt(int64(key.E)).Bytes()
-	d := key.D.Bytes()
-	p := key.Primes[0].Bytes()
-	q := key.Primes[1].Bytes()
-	dp := key.Precomputed.Dp.Bytes()
-	dq := key.Precomputed.Dq.Bytes()
-	qi := key.Precomputed.Qinv.Bytes()
-	nb := base64.URLEncoding.EncodeToString(n)
-	eb := base64.URLEncoding.EncodeToString(e)
-	db := base64.URLEncoding.EncodeToString(d)
-	pb := base64.URLEncoding.EncodeToString(p)
-	qb := base64.URLEncoding.EncodeToString(q)
-	dpb := base64.URLEncoding.EncodeToString(dp)
-	dqb := base64.URLEncoding.EncodeToString(dq)
-	qib := base64.URLEncoding.EncodeToString(qi)
-	return JWK{Kty: KeyTypeRSA, N: nb, E: eb, D: db, P: pb, Q: qb, Dp: dpb, Dq: dqb, Qi: qib, Kid: keyID}
+	return JWK{
+		Kty: KeyTypeRSA,
+		N:   base64.URLEncoding.EncodeToString(key.N.Bytes()),
+		E:   base64.URLEncoding.EncodeToString(big.NewInt(int64(key.E)).Bytes()),
+		D:   base64.URLEncoding.EncodeToString(key.D.Bytes()),
+		P:   base64.URLEncoding.EncodeToString(key.Primes[0].Bytes()),
+		Q:   base64.URLEncoding.EncodeToString(key.Primes[1].Bytes()),
+		Dp:  base64.URLEncoding.EncodeToString(key.Precomputed.Dp.Bytes()),
+		Dq:  base64.URLEncoding.EncodeToString(key.Precomputed.Dq.Bytes()),
+		Qi:  base64.URLEncoding.EncodeToString(key.Precomputed.Qinv.Bytes()),
+		Kid: keyID,
+	}
 }
 
 func (k JWK) GetRSAPrivateKey() (*rsa.PrivateKey, error) {
@@ -91,22 +86,21 @@ func (k JWK) GetRSAPrivateKey() (*rsa.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	n := &big.Int{}
-	n.SetBytes(nb)
-	e := &big.Int{}
-	e.SetBytes(eb)
-	eint := int(e.Int64())
-	d := &big.Int{}
-	d.SetBytes(db)
-	p := &big.Int{}
-	p.SetBytes(pb)
-	q := &big.Int{}
-	q.SetBytes(qb)
-	dp := &big.Int{}
-	dp.SetBytes(dpb)
-	dq := &big.Int{}
-	dq.SetBytes(dqb)
-	qi := &big.Int{}
-	qi.SetBytes(qib)
-	return &rsa.PrivateKey{PublicKey: rsa.PublicKey{N: n, E: eint}, D: d, Primes: []*big.Int{p, q}, Precomputed: rsa.PrecomputedValues{Dp: dp, Dq: dq, Qinv: qi}}, nil
+	return &rsa.PrivateKey{
+		PublicKey: rsa.PublicKey{
+			N: (&big.Int{}).SetBytes(nb),
+			E: int((&big.Int{}).SetBytes(eb).Int64()),
+		},
+		D: (&big.Int{}).SetBytes(db),
+		Primes: []*big.Int{
+			(&big.Int{}).SetBytes(pb),
+			(&big.Int{}).SetBytes(qb),
+		},
+		Precomputed: rsa.PrecomputedValues{
+			Dp:        (&big.Int{}).SetBytes(dpb),
+			Dq:        (&big.Int{}).SetBytes(dqb),
+			Qinv:      (&big.Int{}).SetBytes(qib),
+			CRTValues: []rsa.CRTValue{},
+		},
+	}, nil
 }

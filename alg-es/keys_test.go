@@ -29,7 +29,7 @@ func TestNewSettings(t *testing.T) {
 		wantErr bool
 	}{
 		{"EC key", ecPrivJWK, Settings{priv, "key_id", ""}, false},
-		{"Invalid", invalidJWK, Settings{priv, "key_id", ""}, false},
+		{"Invalid", invalidJWK, Settings{}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
