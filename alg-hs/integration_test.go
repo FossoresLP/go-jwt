@@ -5,7 +5,6 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
-	"encoding/base64"
 	"testing"
 
 	"github.com/fossoreslp/go-jwt"
@@ -16,10 +15,6 @@ func TestHS256(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := p.CurrentKey()
-	bk := make([]byte, base64.StdEncoding.EncodedLen(len(rk.GetPublicKey())))
-	base64.StdEncoding.Encode(bk, rk.GetPublicKey())
-	t.Logf("Created provider with key: %s", string(bk))
 	jwt.SetSignatureProvider(algToString(HS256), p)
 	jwt.SetSigningAlgorithm(algToString(HS256)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
@@ -42,10 +37,6 @@ func TestHS384(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := p.CurrentKey()
-	bk := make([]byte, base64.StdEncoding.EncodedLen(len(rk.GetPublicKey())))
-	base64.StdEncoding.Encode(bk, rk.GetPublicKey())
-	t.Logf("Created provider with key: %s", string(bk))
 	jwt.SetSignatureProvider(algToString(HS384), p)
 	jwt.SetSigningAlgorithm(algToString(HS384)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
@@ -68,10 +59,6 @@ func TestHS512(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	rk := p.CurrentKey()
-	bk := make([]byte, base64.StdEncoding.EncodedLen(len(rk.GetPublicKey())))
-	base64.StdEncoding.Encode(bk, rk.GetPublicKey())
-	t.Logf("Created provider with key: %s", string(bk))
 	jwt.SetSignatureProvider(algToString(HS512), p)
 	jwt.SetSigningAlgorithm(algToString(HS512)) // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))

@@ -4,25 +4,26 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/fossoreslp/go-jwt/publickey"
+	"github.com/fossoreslp/go-jwt/jwk"
+)
+
+var (
+	symmetricJWK = jwk.NewBasic([]byte("test"), "key_id")
+	invalidJWK   = jwk.JWK{}
 )
 
 func TestNewSettings(t *testing.T) {
-	type args struct {
-		key   []byte
-		keyID string
-	}
 	tests := []struct {
 		name    string
-		args    args
+		key     jwk.JWK
 		want    Settings
 		wantErr bool
 	}{
-		{"Normal", args{[]byte("test"), "key_id"}, Settings{[]byte("test"), "key_id", ""}, false},
+		{"Normal", symmetricJWK, Settings{[]byte("test"), "key_id", ""}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewSettings(tt.args.key, tt.args.keyID)
+			got, err := NewSettings(tt.key)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewSettings() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -36,8 +37,7 @@ func TestNewSettings(t *testing.T) {
 
 func TestNewSettingsWithKeyURL(t *testing.T) {
 	type args struct {
-		key    []byte
-		keyID  string
+		key    jwk.JWK
 		keyURL string
 	}
 	tests := []struct {
@@ -46,13 +46,12 @@ func TestNewSettingsWithKeyURL(t *testing.T) {
 		want    Settings
 		wantErr bool
 	}{
-		{"Normal", args{[]byte("test"), "key_id", "key_url"}, Settings{[]byte("test"), "key_id", "key_url"}, false},
-		{"Empty key", args{[]byte(""), "key_id", "key_url"}, Settings{}, true},
-		{"Nil key", args{nil, "key_id", "key_url"}, Settings{}, true},
+		{"Normal", args{symmetricJWK, "key_url"}, Settings{[]byte("test"), "key_id", "key_url"}, false},
+		{"Invalid", args{invalidJWK, "key_url"}, Settings{}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewSettingsWithKeyURL(tt.args.key, tt.args.keyID, tt.args.keyURL)
+			got, err := NewSettingsWithKeyURL(tt.args.key, tt.args.keyURL)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewSettingsWithKeyURL() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -68,11 +67,12 @@ func TestProvider_AddPublicKey(t *testing.T) {
 	tests := []struct {
 		name    string
 		p       *Provider
-		key     publickey.PublicKey
+		key     jwk.JWK
 		wantErr bool
 	}{
-		{"Normal", &Provider{keys: map[string][]byte{}}, publickey.New([]byte("test"), "key_id"), false},
-		{"Key already exists", &Provider{keys: map[string][]byte{"key_id": []byte("test")}}, publickey.New([]byte("test"), "key_id"), true},
+		{"Normal", &Provider{keys: map[string][]byte{}}, symmetricJWK, false},
+		{"Key already exists", &Provider{keys: map[string][]byte{"key_id": []byte("test")}}, symmetricJWK, true},
+		{"Invalid key", &Provider{keys: map[string][]byte{}}, invalidJWK, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -103,9 +103,9 @@ func TestProvider_CurrentKey(t *testing.T) {
 	tests := []struct {
 		name string
 		p    Provider
-		want publickey.PublicKey
+		want jwk.JWK
 	}{
-		{"Normal", Provider{settings: Settings{key: []byte("test"), kid: "key_id"}}, publickey.New([]byte("test"), "key_id")},
+		{"Normal", Provider{settings: Settings{key: []byte("test"), kid: "key_id"}}, symmetricJWK},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

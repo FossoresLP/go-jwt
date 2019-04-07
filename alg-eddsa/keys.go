@@ -3,24 +3,48 @@ package eddsa
 import (
 	"errors"
 
-	"github.com/fossoreslp/go-jwt/publickey"
+	"github.com/fossoreslp/go-jwt/jwk"
 	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/otrv4/ed448"
 	"golang.org/x/crypto/ed25519"
 )
 
-// AddPublicKey adds a public key for verification
-func (p *Provider) AddPublicKey(key publickey.PublicKey) error {
-	id := key.GetKeyID()
-	enc := key.GetPublicKey()
-	if len(enc) == ed25519.PublicKeySize {
-		if _, ok := p.c2[id]; ok {
-			return errors.New("key ID already exists")
-		}
-		p.c2[id] = ed25519.PublicKey(enc)
-		return nil
+// Settings stores the signature settings for an EdDSA curve
+type Settings struct {
+	typ     int
+	ed25519 ed25519.PrivateKey
+	ed448   [144]byte
+	kid     string
+	jku     string
+}
+
+// NewSettings creates new signature settings for the parameters
+func NewSettings(key jwk.JWK) (Settings, error) {
+	return NewSettingsWithKeyURL(key, "")
+}
+
+// NewSettingsWithKeyURL creates new signature settings for the parameters
+func NewSettingsWithKeyURL(key jwk.JWK, keyurl string) (Settings, error) {
+	priv, err := key.GetEdDSAPrivateKey()
+	if err != nil {
+		return Settings{}, err
 	}
-	if len(enc) == 56 {
+	if len(priv) == ed25519.SeedSize {
+		return Settings{Ed25519, ed25519.NewKeyFromSeed(priv), [144]byte{0x00}, key.GetKeyID(), keyurl}, nil
+	}
+	var arr [144]byte
+	copy(arr[:], priv)
+	return Settings{Ed448, nil, arr, key.GetKeyID(), keyurl}, nil
+}
+
+// AddPublicKey adds a public key for verification
+func (p *Provider) AddPublicKey(key jwk.JWK) error {
+	id := key.GetKeyID()
+	enc, err := key.GetEdDSAPublicKey()
+	if err != nil {
+		return err
+	}
+	if key.Crv == jwk.CurveEd448 {
 		if _, ok := p.c4[id]; ok {
 			return errors.New("key ID already exists")
 		}
@@ -29,7 +53,11 @@ func (p *Provider) AddPublicKey(key publickey.PublicKey) error {
 		p.c4[id] = pub
 		return nil
 	}
-	return errors.New("key has invalid length")
+	if _, ok := p.c2[id]; ok {
+		return errors.New("key ID already exists")
+	}
+	p.c2[id] = ed25519.PublicKey(enc)
+	return nil
 }
 
 // RemovePublicKey removes a public key by it's key ID from the verification set
@@ -42,15 +70,17 @@ func (p *Provider) RemovePublicKey(keyid string) {
 }
 
 // CurrentKey returns the public key belonging to the private key used for signing
-func (p Provider) CurrentKey() publickey.PublicKey {
+func (p Provider) CurrentKey() jwk.JWK {
 	if p.curve == Ed25519 {
-		return publickey.New(p.c2[p.settings.kid], p.settings.kid)
+		key, _ := jwk.NewEdDSAPublicKey(p.c2[p.settings.kid], p.settings.kid)
+		return key
 	}
 	if p.curve == Ed448 {
 		k := p.c4[p.settings.kid]
-		return publickey.New(k[:], p.settings.kid)
+		key, _ := jwk.NewEdDSAPublicKey(k[:], p.settings.kid)
+		return key
 	}
-	return publickey.PublicKey{}
+	return jwk.JWK{}
 }
 
 func generateEd25519Keys() (ed25519.PrivateKey, ed25519.PublicKey, string, error) {

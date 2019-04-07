@@ -2,6 +2,8 @@ github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 h1:w1UutsfOrms1J05zt7I
 github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412/go.mod h1:WPjqKcmVOxf0XSf3YxCJs6N6AOSrOx3obionmG7T0y0=
 github.com/fossoreslp/go-uuid-v4 v0.0.0-20180811222708-1631314229c0 h1:3Pzf6xsYL/lCTtz1TCaXSHJux9r0uO9ZhvYYtk+1kJ4=
 github.com/fossoreslp/go-uuid-v4 v0.0.0-20180811222708-1631314229c0/go.mod h1:mcwmVr6pw2XODJJzpTHjk0pyYdPUk9gShONyCl9PP/k=
+github.com/fossoreslp/go-uuid-v4 v1.0.0 h1:HZDPsCNilzw1/PJ1iIRoLr7CREoROz1/b5RXr3OIUzY=
+github.com/fossoreslp/go-uuid-v4 v1.0.0/go.mod h1:jylOsYkbypEni3z7dfRPUyHvdHphkU82RjBawuWkMaw=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=

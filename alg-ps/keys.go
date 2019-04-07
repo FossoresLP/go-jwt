@@ -2,10 +2,9 @@ package ps
 
 import (
 	"crypto/rsa"
-	"crypto/x509"
 	"errors"
 
-	"github.com/fossoreslp/go-jwt/publickey"
+	"github.com/fossoreslp/go-jwt/jwk"
 )
 
 // Settings stores the key for an algorithm
@@ -16,42 +15,30 @@ type Settings struct {
 }
 
 // NewSettings creates new signature settings for the parameters
-func NewSettings(key []byte, keyID string) (Settings, error) {
-	return NewSettingsWithKeyURL(key, keyID, "")
+func NewSettings(key jwk.JWK) (Settings, error) {
+	return NewSettingsWithKeyURL(key, "")
 }
 
 // NewSettingsWithKeyURL creates new signature settings for the parameters
-func NewSettingsWithKeyURL(key []byte, keyID, keyURL string) (Settings, error) {
-	rsaKey, err := x509.ParsePKCS1PrivateKey(key)
+func NewSettingsWithKeyURL(key jwk.JWK, keyURL string) (Settings, error) {
+	rsaKey, err := key.GetRSAPrivateKey()
 	if err != nil {
-		k, err := x509.ParsePKCS8PrivateKey(key)
-		if err != nil {
-			return Settings{}, errors.New("could not decode private key as either PKCS1 or PKCS8")
-		}
-		castKey, ok := k.(*rsa.PrivateKey)
-		if !ok {
-			return Settings{}, errors.New("PKCS8 does not contain a RSA private key")
-		}
-		rsaKey = castKey
+		return Settings{}, err
 	}
-	return Settings{rsaKey, keyID, keyURL}, nil
+	return Settings{rsaKey, key.GetKeyID(), keyURL}, nil
 }
 
 // AddPublicKey adds a public key for verification
-func (p *Provider) AddPublicKey(key publickey.PublicKey) error {
+func (p *Provider) AddPublicKey(key jwk.JWK) error {
 	id := key.GetKeyID()
 	if _, ok := p.keys[id]; ok {
 		return errors.New("key ID already exists")
 	}
-	pub, err := x509.ParsePKIXPublicKey(key.GetPublicKey())
+	pub, err := key.GetRSAPublicKey()
 	if err != nil {
-		return errors.New("could not decode public key")
+		return err
 	}
-	rsaKey, ok := pub.(*rsa.PublicKey)
-	if !ok {
-		return errors.New("public key is not a RSA public key")
-	}
-	p.keys[id] = rsaKey
+	p.keys[id] = pub
 	return nil
 }
 
@@ -64,7 +51,6 @@ func (p *Provider) RemovePublicKey(keyid string) {
 }
 
 // CurrentKey returns the public key belonging to the private key used for signing.
-func (p Provider) CurrentKey() publickey.PublicKey {
-	b, _ := x509.MarshalPKIXPublicKey(&p.settings.private.PublicKey) // Marshaling an RSA public key should never fail
-	return publickey.New(b, p.settings.kid)
+func (p Provider) CurrentKey() jwk.JWK {
+	return jwk.NewRSAPublicKey(&p.settings.private.PublicKey, p.settings.kid)
 }

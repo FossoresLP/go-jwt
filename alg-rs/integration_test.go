@@ -1,7 +1,6 @@
 package rs
 
 import (
-	"encoding/pem"
 	"testing"
 
 	"github.com/fossoreslp/go-jwt"
@@ -12,8 +11,6 @@ func TestRS256(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
-	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetSignatureProvider("RS256", p)
 	jwt.SetSigningAlgorithm("RS256") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
@@ -36,8 +33,6 @@ func TestRS384(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
-	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetSignatureProvider("RS384", p)
 	jwt.SetSigningAlgorithm("RS384") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))
@@ -60,8 +55,6 @@ func TestRS512(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not initialize provider: %s", err.Error())
 	}
-	b := pem.Block{Type: "PUBLIC KEY", Headers: nil, Bytes: p.CurrentKey().GetPublicKey()}
-	t.Logf("Created provider with key: %s", string(pem.EncodeToMemory(&b)))
 	jwt.SetSignatureProvider("RS512", p)
 	jwt.SetSigningAlgorithm("RS512") // nolint:errcheck
 	token := jwt.New([]byte(`{"test": 1}`))

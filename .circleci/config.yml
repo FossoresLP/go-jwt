@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run: apk add git build-base
       - run: go get -u github.com/jstemmer/go-junit-report
-      - run: mkdir test-results test-results/Base test-results/HMAC-SHA2 test-results/RSA-PKCS1_5 test-results/RSA-PSS test-results/ECDSA test-results/EdDSA test-results/PublicKey
+      - run: mkdir test-results test-results/Base test-results/HMAC-SHA2 test-results/RSA-PKCS1_5 test-results/RSA-PSS test-results/ECDSA test-results/EdDSA test-results/JWK
       - run:
           name: Base package unit tests
           command: go test -v 2>&1 | go-junit-report > test-results/Base/report.xml
@@ -29,7 +29,7 @@ jobs:
           command: go test -v ./alg-eddsa 2>&1 | go-junit-report > test-results/EdDSA/report.xml
       - run:
           name: Public key unit tests
-          command: go test -v ./publickey 2>&1 | go-junit-report > test-results/PublicKey/report.xml
+          command: go test -v ./jwk 2>&1 | go-junit-report > test-results/JWK/report.xml
       - store_test_results:
           path: test-results
   coverage:
@@ -43,29 +43,10 @@ jobs:
       - run: chmod +x uploader.run
       - run:
           name: Calculate coverage
-          command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-rs ./alg-ps ./alg-es ./alg-eddsa ./publickey
+          command: go test -coverprofile=coverage.txt . ./alg-hs ./alg-rs ./alg-ps ./alg-es ./alg-eddsa ./jwk
       - run:
           name: Upload coverage
           command: ./uploader.run
-  golangci-lint:
-    docker:
-      - image: golang:alpine
-    working_directory: ~/jwt
-    steps:
-      - run: apk add git build-base curl jq
-      - checkout
-      - run: go version | grep -o "[0-9]*\.[0-9]*\.*[0-9]*" > vgo
-      - run: curl -s https://api.github.com/repos/golangci/golangci-lint/releases/latest | jq -r .tag_name > vlinter
-      - restore_cache:
-          key: linter{{checksum "vlinter"}}_go{{checksum "vgo"}}
-      - run: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-      - save_cache:
-          key: linter{{checksum "vlinter"}}_go{{checksum "vgo"}}
-          paths:
-            - /go
-      - run:
-          name: golangci-lint
-          command: golangci-lint run
 
 workflows:
   version: 2
@@ -73,4 +54,3 @@ workflows:
     jobs:
       - go-test
       - coverage
-      - golangci-lint
