@@ -81,7 +81,7 @@ func (k JWK) GetECPublicKey() (*ecdsa.PublicKey, error) {
 	return &ecdsa.PublicKey{Curve: curve, X: x, Y: y}, nil
 }
 
-// NewECPublicKey converts an ECDSA private key to a JWK and returns an error in case that's not possible
+// NewECPrivateKey converts an ECDSA private key to a JWK and returns an error in case that's not possible
 func NewECPrivateKey(key *ecdsa.PrivateKey, keyID string) (JWK, error) {
 	var curve Curve
 	switch key.Curve.Params().Name {

@@ -72,6 +72,7 @@ func TestProvider_AddPublicKey(t *testing.T) {
 	}{
 		{"Normal", &Provider{keys: map[string][]byte{}}, symmetricJWK, false},
 		{"Key already exists", &Provider{keys: map[string][]byte{"key_id": []byte("test")}}, symmetricJWK, true},
+		{"Invalid key", &Provider{keys: map[string][]byte{}}, invalidJWK, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

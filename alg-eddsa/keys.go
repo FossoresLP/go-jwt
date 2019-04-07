@@ -32,12 +32,9 @@ func NewSettingsWithKeyURL(key jwk.JWK, keyurl string) (Settings, error) {
 	if len(priv) == ed25519.SeedSize {
 		return Settings{Ed25519, ed25519.NewKeyFromSeed(priv), [144]byte{0x00}, key.GetKeyID(), keyurl}, nil
 	}
-	if len(priv) == 144 {
-		var arr [144]byte
-		copy(arr[:], priv)
-		return Settings{Ed448, nil, arr, key.GetKeyID(), keyurl}, nil
-	}
-	return Settings{}, errors.New("private key has wrong size")
+	var arr [144]byte
+	copy(arr[:], priv)
+	return Settings{Ed448, nil, arr, key.GetKeyID(), keyurl}, nil
 }
 
 // AddPublicKey adds a public key for verification

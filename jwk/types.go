@@ -26,6 +26,7 @@ const (
 	CurveX448 Curve = "X448"
 )
 
+// KeyType indicates which type of key the JWK contains
 type KeyType string
 
 const (
@@ -42,6 +43,7 @@ const (
 	KeyTypeOKP KeyType = "OKP"
 )
 
+// Use indicates how the contained key should be used
 type Use string
 
 const (
@@ -52,6 +54,7 @@ const (
 	UseEnc Use = "enc"
 )
 
+// KeyOperation indicates the intended key operations
 type KeyOperation string
 
 const (
@@ -80,6 +83,7 @@ const (
 	KeyOperationDeriveBits KeyOperation = "deriveBits"
 )
 
+// Algorithm indicates the algorithm the key should be used with
 type Algorithm string
 
 const (
