@@ -7,6 +7,7 @@ import (
 	"math/big"
 )
 
+// NewRSAPublicKey converts a RSA public key to a JWK
 func NewRSAPublicKey(key *rsa.PublicKey, keyID string) JWK {
 	n := key.N.Bytes()
 	e := big.NewInt(int64(key.E)).Bytes()
@@ -15,6 +16,7 @@ func NewRSAPublicKey(key *rsa.PublicKey, keyID string) JWK {
 	return JWK{Kty: KeyTypeRSA, N: nb, E: eb, Kid: keyID}
 }
 
+// GetRSAPublicKey tries to convert a JWK to a RSA public key and returns an error in case that's not possible
 func (k JWK) GetRSAPublicKey() (*rsa.PublicKey, error) {
 	if k.Kty != KeyTypeRSA {
 		return nil, fmt.Errorf("Key type %q cannot be converted to RSA public key", k.Kty)
@@ -35,6 +37,7 @@ func (k JWK) GetRSAPublicKey() (*rsa.PublicKey, error) {
 	return &rsa.PublicKey{N: n, E: eint}, nil
 }
 
+// NewRSAPrivateKey converts a RSA private key to a JWK
 func NewRSAPrivateKey(key *rsa.PrivateKey, keyID string) JWK {
 	return JWK{
 		Kty: KeyTypeRSA,
@@ -50,6 +53,7 @@ func NewRSAPrivateKey(key *rsa.PrivateKey, keyID string) JWK {
 	}
 }
 
+// GetRSAPrivateKey tries to convert a JWK to a RSA private key and returns an error in case that's not possible
 func (k JWK) GetRSAPrivateKey() (*rsa.PrivateKey, error) {
 	if k.Kty != KeyTypeRSA {
 		return nil, fmt.Errorf("Key type %q cannot be converted to RSA public key", k.Kty)

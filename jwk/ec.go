@@ -8,6 +8,7 @@ import (
 	"math/big"
 )
 
+// NewECPublicKey converts an ECDSA public key to a JWK and returns an error in case that's not possible
 func NewECPublicKey(key *ecdsa.PublicKey, keyID string) (JWK, error) {
 	var curve Curve
 	switch key.Curve.Params().Name {
@@ -39,6 +40,7 @@ func NewECPublicKey(key *ecdsa.PublicKey, keyID string) (JWK, error) {
 	return JWK{Kty: KeyTypeEC, Crv: curve, X: xb, Y: yb, Kid: keyID}, nil
 }
 
+// GetECPublicKey tries to convert a JWK to a ECDSA public key and returns an error in case that's not possible
 func (k JWK) GetECPublicKey() (*ecdsa.PublicKey, error) {
 	if k.Kty != KeyTypeEC {
 		return nil, fmt.Errorf("Key type %q cannot be converted to EC public key", k.Kty)
@@ -79,6 +81,7 @@ func (k JWK) GetECPublicKey() (*ecdsa.PublicKey, error) {
 	return &ecdsa.PublicKey{Curve: curve, X: x, Y: y}, nil
 }
 
+// NewECPublicKey converts an ECDSA private key to a JWK and returns an error in case that's not possible
 func NewECPrivateKey(key *ecdsa.PrivateKey, keyID string) (JWK, error) {
 	var curve Curve
 	switch key.Curve.Params().Name {
@@ -112,6 +115,7 @@ func NewECPrivateKey(key *ecdsa.PrivateKey, keyID string) (JWK, error) {
 	return JWK{Kty: KeyTypeEC, Crv: curve, X: xb, Y: yb, D: db, Kid: keyID}, nil
 }
 
+// GetECPrivateKey tries to convert a JWK to a ECDSA private key and returns an error in case that's not possible
 func (k JWK) GetECPrivateKey() (*ecdsa.PrivateKey, error) {
 	if k.Kty != KeyTypeEC {
 		return nil, fmt.Errorf("Key type %q cannot be converted to EC public key", k.Kty)

@@ -39,11 +39,13 @@ func (k JWK) GetKeyID() string {
 	return k.Kid
 }
 
+// NewBasic converts a symmetric / other key to a JWK
 func NewBasic(key []byte, keyID string) JWK {
 	kb := base64.URLEncoding.EncodeToString(key)
 	return JWK{Kty: KeyTypeOct, K: kb, Kid: keyID}
 }
 
+// GetBasic tries to convert a JWK to a symmetric / other key and returns an error in case that's not possible
 func (k JWK) GetBasic() ([]byte, error) {
 	if k.Kty != KeyTypeOct {
 		return nil, fmt.Errorf("Key type %q cannot be converted to symmetric key", k.Kty)

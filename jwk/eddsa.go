@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// NewEdDSAPublicKey converts an EdDSA public key to a JWK and returns an error in case that's not possible
 func NewEdDSAPublicKey(key []byte, keyID string) (JWK, error) {
 	var curve Curve
 	switch len(key) {
@@ -19,6 +20,7 @@ func NewEdDSAPublicKey(key []byte, keyID string) (JWK, error) {
 	return JWK{Kty: KeyTypeOKP, Crv: curve, X: xb, Kid: keyID}, nil
 }
 
+// GetEdDSAPublicKey tries to convert a JWK to a EdDSA public key and returns an error in case that's not possible
 func (k JWK) GetEdDSAPublicKey() ([]byte, error) {
 	if k.Kty != KeyTypeOKP {
 		return nil, fmt.Errorf("Key type %q cannot be converted to EdDSA public key", k.Kty)
@@ -42,6 +44,7 @@ func (k JWK) GetEdDSAPublicKey() ([]byte, error) {
 	return nil, fmt.Errorf("Unknown curve %q", k.Crv)
 }
 
+// NewEdDSAPrivateKey converts an EdDSA private key to a JWK and returns an error in case that's not possible
 func NewEdDSAPrivateKey(key []byte, public []byte, keyID string) (JWK, error) {
 	var curve Curve
 	switch len(key) {
@@ -63,6 +66,7 @@ func NewEdDSAPrivateKey(key []byte, public []byte, keyID string) (JWK, error) {
 	return JWK{Kty: KeyTypeOKP, Crv: curve, X: xb, D: db, Kid: keyID}, nil
 }
 
+// GetEdDSAPrivateKey tries to convert a JWK to a EdDSA private key and returns an error in case that's not possible
 func (k JWK) GetEdDSAPrivateKey() ([]byte, error) {
 	if k.Kty != KeyTypeOKP {
 		return nil, fmt.Errorf("Key type %q cannot be converted to EdDSA private key", k.Kty)
